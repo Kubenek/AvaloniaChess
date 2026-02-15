@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="Chess.MainWindow"
+        Title="Chess"
+        Width="1000" Height="600">
+
+    <StackPanel VerticalAlignment="Center">
+
+        <TextBlock Name="TextBlack" HorizontalAlignment="Center" VerticalAlignment="Top" Text="Black's Turn" Margin="0, 20" FontSize="32" Opacity="0.2"></TextBlock>
+        
+        <Grid Name="GameBoard" Width="400" Height="400"></Grid>
+
+        <TextBlock Name="TextWhite" HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="White's Turn" Margin="0, 20" FontSize="32"></TextBlock>
+
+    </StackPanel>
+
+</Window>
