@@ -155,7 +155,7 @@ public partial class MainWindow : Window
                 isCastlingQ = false;
             }
         } 
-        
+
         isCastlingK = false;
         isCastlingQ = false;    
         
@@ -169,7 +169,7 @@ public partial class MainWindow : Window
         {
             
             var square = squares[piece.Row, piece.Column];
-            if(square.Background == Brushes.DarkRed)
+            if(square.Background == Brushes.DarkRed && activePiece != null)
             {
                 GameBoard.Children.Remove(piece.pieceVisual);
                 GameBoard.Children.Remove(activePiece.pieceVisual);
@@ -228,8 +228,11 @@ public partial class MainWindow : Window
             if(board.GetPieceAt(move.Item1, move.Item2) != null)
             {
                 var square = squares[move.Item1, move.Item2];
-                originalSquareColors[square] = square.Background;
-                square.Background = Brushes.DarkRed;
+                if (square != null && square.Background != null)
+                {
+                    originalSquareColors[square] = square.Background;
+                    square.Background = Brushes.DarkRed;
+                }
                 continue;
             }
 
