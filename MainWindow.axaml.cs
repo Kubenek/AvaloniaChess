@@ -225,6 +225,9 @@ public partial class MainWindow : Window
         foreach(var move in moves)
         {
 
+            var legal = isMoveLegal(board, piece, move.Item1, move.Item2);
+            if(!legal) continue;
+
             if(board.GetPieceAt(move.Item1, move.Item2) != null)
             {
                 var square = squares[move.Item1, move.Item2];
@@ -302,6 +305,32 @@ public partial class MainWindow : Window
         GameBoard.Children.Add(pieceVisual);
 
         board.Pieces.Add(piece);
+    }
+
+    private bool isMoveLegal(ChessBoard board, Piece piece, int toRow, int toCol)
+    {
+        int ogRow = piece.Row; int ogCol = piece.Column;
+        var capturedPiece = board.GetPieceAt(toRow, toCol);
+
+        board.Pieces.Remove(piece);
+        if(capturedPiece != null)
+            board.Pieces.Remove(capturedPiece);
+        
+        piece.Row = toRow;
+        piece.Column = toCol;
+        board.Pieces.Add(piece);
+
+        var king = board.GetKing(piece.IsWhite);
+        bool kingChecked = board.isKingInCheck(king);
+
+        board.Pieces.Remove(piece);
+        piece.Row = ogRow; piece.Column = ogCol;
+        board.Pieces.Add(piece);
+
+        if (capturedPiece != null)
+            board.Pieces.Add(capturedPiece);
+
+        return !kingChecked;
     }
 
 }
