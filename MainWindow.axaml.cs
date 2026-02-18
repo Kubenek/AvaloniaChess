@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Avalonia.Remote.Protocol.Input;
 using System.Data.SqlTypes;
 using System.Net;
+using System.Linq;
 
 namespace Chess;
 
@@ -158,7 +159,14 @@ public partial class MainWindow : Window
 
         isCastlingK = false;
         isCastlingQ = false;    
-        
+
+        //! add mate detection
+        //* after a player finishes their move, check two things
+        //* if the enemy king is in check
+        //* if yes continue and check all enemy pieces, if they have no moves that dont get the king out of the check, game, if not, continue
+
+        var isMated = isMate(board, !piece.IsWhite);
+        if(isMated) showGameOver(piece.IsWhite);
 
     }
 
@@ -331,6 +339,38 @@ public partial class MainWindow : Window
             board.Pieces.Add(capturedPiece);
 
         return !kingChecked;
+    }
+
+    private bool isMate(ChessBoard board, bool isWhite)
+    {
+        var enemyKing = board.GetKing(isWhite);
+        if(board.isKingInCheck(enemyKing))
+        {
+            foreach(var p in board.Pieces.ToList())
+            {
+                if(p.IsWhite != isWhite) continue;
+                var moves = p.GetLegalMoves(board);
+
+                foreach(var move in moves)
+                {
+                    if(isMoveLegal(board, p, move.Item1, move.Item2)) return false;
+
+                }
+
+            }
+
+            return true;
+        }
+
+        return false;
+
+    }
+
+    private void showGameOver(bool isWhite)
+    {
+        string winner = isWhite ? "White" : "Black";
+        CheckmateText.Text = $"{winner} wins by Checkmate!";
+        CheckmateOverlay.IsVisible = true;
     }
 
 }
