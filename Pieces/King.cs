@@ -1,6 +1,7 @@
 
 using System.Collections.Generic;
 using System.Data;
+using System.Security.Cryptography;
 using Avalonia.Diagnostics.Screenshots;
 using Chess.Board;
 using SkiaSharp;
@@ -57,5 +58,14 @@ namespace Chess.Pieces
 
             return moves;
         }
+
+        public override Piece Clone()
+        {
+            var clone = new King(this.IsWhite);
+            clone.Row = this.Row; clone.Column = this.Column;
+            clone.hasMoved = this.hasMoved;
+            return clone;
+        }
+
     }
 }

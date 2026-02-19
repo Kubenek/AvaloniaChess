@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using System;
 using Chess.Pieces;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Chess.Board
 {
@@ -69,6 +70,18 @@ namespace Chess.Board
                 }
             }
             return false;
+        }
+
+        public ChessBoard Clone()
+        {
+            var clone = new ChessBoard();
+            
+            foreach(var p in this.Pieces)
+            {
+                clone.Pieces.Add(p.Clone());
+            }
+
+            return clone;
         }
 
     }

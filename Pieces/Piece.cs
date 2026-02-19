@@ -24,5 +24,7 @@ namespace Chess.Pieces
 
         public abstract List<(int, int)> GetLegalMoves(ChessBoard board);
 
+        public abstract Piece Clone();
+
     }
 }

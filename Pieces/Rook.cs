@@ -57,5 +57,14 @@ namespace Chess.Pieces
 
             return moves;
         }
+    
+        public override Piece Clone()
+        {
+            var clone = new Rook(this.IsWhite);
+            clone.Row = this.Row; clone.Column = this.Column;
+            clone.hasMoved = this.hasMoved;
+            return clone;
+        }
+
     }
 }

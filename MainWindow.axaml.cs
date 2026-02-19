@@ -312,53 +312,41 @@ public partial class MainWindow : Window
 
     private bool isMoveLegal(ChessBoard board, Piece piece, int toRow, int toCol)
     {
-        int ogRow = piece.Row; int ogCol = piece.Column;
-        var capturedPiece = board.GetPieceAt(toRow, toCol);
+        ChessBoard clone = board.Clone();
 
-        board.Pieces.Remove(piece);
-        if(capturedPiece != null)
-            board.Pieces.Remove(capturedPiece);
-        
-        piece.Row = toRow;
-        piece.Column = toCol;
-        board.Pieces.Add(piece);
+        Piece? clonedPiece = clone.GetPieceAt(piece.Row, piece.Column);
 
-        var king = board.GetKing(piece.IsWhite)!;
-        bool kingChecked = board.isKingInCheck(king);
+        if(clonedPiece == null) return false;
 
-        board.Pieces.Remove(piece);
-        piece.Row = ogRow; piece.Column = ogCol;
-        board.Pieces.Add(piece);
+        Piece? capturedPiece = clone.GetPieceAt(toRow, toCol);
 
-        if (capturedPiece != null)
-            board.Pieces.Add(capturedPiece);
+        if(capturedPiece != null) clone.Pieces.Remove(capturedPiece);
 
-        return !kingChecked;
+        clonedPiece.Row = toRow; clonedPiece.Column = toCol;
+
+        King king = clone.GetKing(piece.IsWhite)!;
+        return !clone.isKingInCheck(king);
     }
 
     private bool isMate(ChessBoard board, bool isWhite)
     {
-        var enemyKing = board.GetKing(isWhite)!;
-        if(board.isKingInCheck(enemyKing))
+        var king = board.GetKing(isWhite)!;
+        if(!board.isKingInCheck(king)) return false;
+
+        var pieces = board.Pieces.Where(p => p.IsWhite == isWhite).ToList();
+        
+        foreach(var p in pieces)
         {
-            foreach(var p in board.Pieces.ToList())
+            var moves = p.GetLegalMoves(board);
+
+            foreach(var move in moves)
             {
-                if(p.IsWhite != isWhite) continue;
-                var moves = p.GetLegalMoves(board);
-
-                foreach(var move in moves)
-                {
-                    if(isMoveLegal(board, p, move.Item1, move.Item2)) return false;
-
-                }
-
+                if(isMoveLegal(board, p, move.Item1, move.Item2)) return false;
             }
 
-            return true;
         }
 
-        return false;
-
+        return true;
     }
 
     private void showGameOver(bool isWhite)
