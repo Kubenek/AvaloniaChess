@@ -18,7 +18,8 @@ public partial class MainWindow : Window
 {
     private Piece? activePiece = null;
     private List<Control> moveHighlights = new List<Control>();
-    private Dictionary<Border, IBrush> originalSquareColors = new Dictionary<Border, IBrush>();
+    private Dictionary<Border, IBrush> originalSquareColors = new ();
+    private Dictionary<Border, IBrush> checkHighlights = new ();
     private Border[,] squares = new Border[8,8];
 
     private bool isWhiteTurn = true;
@@ -29,7 +30,6 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-
         CreateChessBoard();
         InitializePieces();   
     }
@@ -160,6 +160,8 @@ public partial class MainWindow : Window
         isCastlingK = false;
         isCastlingQ = false;    
 
+        highlightCheck(board);
+
         var isMated = isMate(board, !piece.IsWhite);
         if(isMated) showGameOver(piece.IsWhite);
 
@@ -191,6 +193,13 @@ public partial class MainWindow : Window
 
                 TextWhite.Opacity = isWhiteTurn ? 1 : 0.2;
                 TextBlack.Opacity = isWhiteTurn ? 0.2 : 1;
+
+                highlightCheck(board);
+                var isMated = isMate(board, activePiece.IsWhite ? false : true);
+                if(isMated) showGameOver(activePiece.IsWhite);
+
+                activePiece = null;
+
             }
 
             return;
@@ -236,7 +245,7 @@ public partial class MainWindow : Window
                 var square = squares[move.Item1, move.Item2];
                 if (square != null && square.Background != null)
                 {
-                    originalSquareColors[square] = square.Background;
+                    originalSquareColors[square] = GetOriginalSquareColor(move.Item1, move.Item2);
                     square.Background = Brushes.DarkRed;
                 }
                 continue;
@@ -279,6 +288,7 @@ public partial class MainWindow : Window
 
         foreach(var kvp in originalSquareColors)
         {
+            if(checkHighlights.ContainsKey(kvp.Key)) continue;
             kvp.Key.Background = kvp.Value;
         }
         originalSquareColors.Clear();
@@ -330,6 +340,7 @@ public partial class MainWindow : Window
 
     private bool isMate(ChessBoard board, bool isWhite)
     {
+
         var king = board.GetKing(isWhite)!;
         if(!board.isKingInCheck(king)) return false;
 
@@ -354,6 +365,42 @@ public partial class MainWindow : Window
         string winner = isWhite ? "White" : "Black";
         CheckmateText.Text = $"{winner} wins by Checkmate!";
         CheckmateOverlay.IsVisible = true;
+    }
+
+    private void highlightCheck(ChessBoard board)
+    {
+        foreach(var sq in checkHighlights)
+        {
+            sq.Key.Background = sq.Value;
+        }
+        checkHighlights.Clear();
+
+        King Wking = board.GetKing(true)!;
+        King Bking = board.GetKing(false)!;
+
+        if(board.isKingInCheck(Wking))
+        {
+            var square = squares[Wking.Row, Wking.Column];
+            if (square != null && square.Background != null)
+            {
+                checkHighlights[square] = GetOriginalSquareColor(Wking.Row, Wking.Column);
+                square.Background = Brushes.DarkRed;
+            }
+        } if(board.isKingInCheck(Bking))
+        {
+            var square = squares[Bking.Row, Bking.Column];
+            if (square != null && square.Background != null)
+            {
+                checkHighlights[square] = GetOriginalSquareColor(Bking.Row, Bking.Column);
+                square.Background = Brushes.DarkRed;
+            }
+        }
+
+    }
+
+    private IBrush GetOriginalSquareColor(int row, int col)
+    {
+        return (row + col) % 2 == 0 ? Brushes.DimGray : Brushes.Gray;
     }
 
 }
