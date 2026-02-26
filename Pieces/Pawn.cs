@@ -54,7 +54,7 @@ namespace Chess.Pieces
             {
                 moves.Add((newRow, Column));
             } 
-            if(doubleMove && board.isEmpty(newRow+direction, Column))
+            if(doubleMove && board.isEmpty(newRow, Column) && board.isEmpty(newRow+direction, Column))
             {
                 moves.Add((newRow+direction, Column));
             }
