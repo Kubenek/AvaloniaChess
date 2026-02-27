@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Security.Cryptography;
 using Avalonia.Diagnostics.Screenshots;
-using Chess.Board;
 using SkiaSharp;
 
 namespace Chess.Pieces
@@ -16,6 +15,8 @@ namespace Chess.Pieces
         }
 
         public bool hasMoved = false;
+
+        /*
 
         public override List<(int, int)> GetLegalMoves(ChessBoard board) 
         {
@@ -66,6 +67,8 @@ namespace Chess.Pieces
             clone.hasMoved = this.hasMoved;
             return clone;
         }
+
+        */
 
     }
 }

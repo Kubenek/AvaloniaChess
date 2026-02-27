@@ -1,6 +1,5 @@
 
 using System.Collections.Generic;
-using Chess.Board;
 using SkiaSharp;
 
 namespace Chess.Pieces
@@ -13,6 +12,8 @@ namespace Chess.Pieces
         }
 
         public bool doubleMove = true;
+
+        /*
 
         public override List<(int, int)> GetLegalMoves(ChessBoard board) 
         {
@@ -61,13 +62,15 @@ namespace Chess.Pieces
 
             return moves;
         }
-    
+
         public override Piece Clone()
         {
             var clone = new Pawn(this.IsWhite);
             clone.Row = this.Row; clone.Column = this.Column;
             return clone;
         }
+
+        */
 
     }
 }

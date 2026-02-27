@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using Avalonia.Diagnostics.Screenshots;
-using Chess.Board;
 using SkiaSharp;
 
 namespace Chess.Pieces
@@ -13,6 +12,8 @@ namespace Chess.Pieces
         {
             Texture = "♛";
         }
+
+        /*
 
         public override List<(int, int)> GetLegalMoves(ChessBoard board) 
         {
@@ -66,6 +67,6 @@ namespace Chess.Pieces
             clone.Row = this.Row; clone.Column = this.Column;
             return clone;
         }
-
+        */
     }
 }

@@ -3,8 +3,6 @@ using Avalonia.Media;
 using Avalonia;
 using System.Runtime.Serialization;
 
-using Chess.Pieces;
-using Chess.Board;
 using System;
 using System.Collections.Generic;
 using Avalonia.Remote.Protocol.Input;
@@ -12,10 +10,15 @@ using System.Data.SqlTypes;
 using System.Net;
 using System.Linq;
 
+using Chess.UI;
+using Chess.GameManager;
+using Chess.Pieces;
+
 namespace Chess;
 
 public partial class MainWindow : Window
 {
+    /*
     private Piece? activePiece = null;
     private List<Control> moveHighlights = new List<Control>();
     private Dictionary<Border, IBrush> originalSquareColors = new ();
@@ -27,70 +30,21 @@ public partial class MainWindow : Window
     private bool isCastlingK = false;
     private bool isCastlingQ = false;
 
+    */
+
     public MainWindow()
     {
         InitializeComponent();
-        CreateChessBoard();
-        InitializePieces();   
-    }
 
-    private void CreateChessBoard()
-    {
-        int size = 8;
+        BoardRender.renderBoard(GameBoard);
 
-        for (int i=0; i<size; i++) { GameBoard.RowDefinitions.Add(new RowDefinition(GridLength.Star)); }
-        for (int i=0; i<size; i++) { GameBoard.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star)); }
+        ChessManager manager = new ChessManager();
+        manager.initializePieces();
 
-        for (int i=0; i<size; i++)
-        {
-            for(int j=0; j<size; j++)
-            {
-                var square = new Border
-                {
-                    Background= (i+j) % 2 == 0 ? Brushes.DimGray : Brushes.Gray
-                };
-                Grid.SetRow(square, i);
-                Grid.SetColumn(square, j);
-
-                squares[i, j] = square;
-
-                GameBoard.Children.Add(square);
-
-            }
-        }
+        PieceRender.renderPieces(GameBoard, manager.pieces);
 
     }
-
-    private void InitializePieces()
-    {
-        var board = new Chess.Board.ChessBoard();
-        InitializeSide(board, true);
-        InitializeSide(board, false);
-        
-    }
-
-    private void InitializeSide(ChessBoard board, bool isWhite)
-    {
-
-        var pawnRow = isWhite ? 6 : 1;
-
-        for(int col = 0; col < 8; col++)
-        {
-            var pawn = new Pawn(isWhite){ Row = pawnRow, Column = col };
-            CreatePiece(pawn, board);
-        }
-
-        var backRow = isWhite ? 7 : 0;
-
-        CreatePiece(new Rook(isWhite) { Row = backRow, Column = 0 }, board);
-        CreatePiece(new Knight(isWhite) { Row = backRow, Column = 1 }, board);
-        CreatePiece(new Bishop(isWhite) { Row = backRow, Column = 2 }, board);
-        CreatePiece(new Queen(isWhite) { Row = backRow, Column = 3 }, board);
-        CreatePiece(new King(isWhite) { Row = backRow, Column = 4 }, board);
-        CreatePiece(new Bishop(isWhite) { Row = backRow, Column = 5 }, board);
-        CreatePiece(new Knight(isWhite) { Row = backRow, Column = 6 }, board);
-        CreatePiece(new Rook(isWhite) { Row = backRow, Column = 7 }, board);
-    }
+/*
 
     private void DotClicked(Piece piece, int row, int col, ChessBoard board)
     {
@@ -294,32 +248,6 @@ public partial class MainWindow : Window
         originalSquareColors.Clear();
     }
 
-    private void CreatePiece(Piece piece, ChessBoard board)
-    {
-        var pieceVisual = new TextBlock
-        {
-            Text = piece.Texture,
-            FontSize = 50,
-            FontFamily = "Segoe UI Symbol",
-            Foreground = piece.IsWhite ? Brushes.White : Brushes.Black,
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
-        };
-
-        pieceVisual.PointerPressed += (sender, e) =>
-        {
-            PieceClicked(piece, board);
-        };
-        
-        piece.pieceVisual = pieceVisual;
-
-        Grid.SetRow(pieceVisual, piece.Row);
-        Grid.SetColumn(pieceVisual, piece.Column);
-        GameBoard.Children.Add(pieceVisual);
-
-        board.Pieces.Add(piece);
-    }
-
     private bool isMoveLegal(ChessBoard board, Piece piece, int toRow, int toCol)
     {
         ChessBoard clone = board.Clone();
@@ -402,5 +330,5 @@ public partial class MainWindow : Window
     {
         return (row + col) % 2 == 0 ? Brushes.DimGray : Brushes.Gray;
     }
-
+*/
 }

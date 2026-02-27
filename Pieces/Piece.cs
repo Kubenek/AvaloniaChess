@@ -2,29 +2,16 @@
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Remote.Protocol.Input;
-using Chess.Board;
 
 namespace Chess.Pieces
 {
-    public abstract class Piece
+    public abstract class Piece(bool isWhite)
     {
-        public bool IsWhite { get; set; }
+        public bool IsWhite { get; set; } = isWhite;
 
-        public string Texture { get; protected set; }
-        public TextBlock pieceVisual {get; set; } = new TextBlock();
+        public string Texture { get; protected set; } = "";
 
         public int Row { get; set;}
         public int Column { get; set;}
-
-        public Piece(bool isWhite)
-        {
-            IsWhite = isWhite;
-            Texture = "";
-        }
-
-        public abstract List<(int, int)> GetLegalMoves(ChessBoard board);
-
-        public abstract Piece Clone();
-
     }
 }
