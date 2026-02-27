@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Remote.Protocol.Input;
+using Chess.GameManager;
 
 namespace Chess.Pieces
 {
@@ -13,5 +14,8 @@ namespace Chess.Pieces
 
         public int Row { get; set;}
         public int Column { get; set;}
+
+        public abstract List<(int, int)> availableMoves(ChessManager manager);
+
     }
 }

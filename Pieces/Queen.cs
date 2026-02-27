@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using Avalonia.Diagnostics.Screenshots;
+using Chess.GameManager;
 using SkiaSharp;
 
 namespace Chess.Pieces
@@ -13,9 +14,7 @@ namespace Chess.Pieces
             Texture = "♛";
         }
 
-        /*
-
-        public override List<(int, int)> GetLegalMoves(ChessBoard board) 
+        public override List<(int, int)> availableMoves(ChessManager manager) 
         {
             var moves = new List<(int, int)>();
 
@@ -31,42 +30,36 @@ namespace Chess.Pieces
                 (1, 1)     // down-right
             };
 
+            var pieces = manager.pieces;
+
             foreach(var (rowDir, colDir) in directions)
             {
-                int newRow = Row;
-                int newCol = Column;
+                int currentRow =    Row;
+                int currentCol = Column;
 
                 while(true)
                 {
-                    newRow += rowDir;
-                    newCol += colDir;
+                    currentRow += rowDir;
+                    currentCol += colDir;
 
-                    if(newRow < 0 || newCol < 0 || newRow >= 8 || newCol >= 8) break;
+                    if(currentRow < 0 || currentCol < 0 || currentRow >= 8 || currentCol >= 8) break;
 
-                    if(board.isEmpty(newRow, newCol))
+                    var targetSquare = pieces[currentRow, currentCol];
+
+                    if(targetSquare == null)
+                        moves.Add((currentRow, currentCol));
+                    else if(targetSquare.IsWhite != IsWhite)
                     {
-                        moves.Add((newRow, newCol));
-                    } else if(board.GetPieceAt(newRow, newCol)?.IsWhite != IsWhite)
-                    {
-                        moves.Add((newRow, newCol));
+                        moves.Add((currentRow, currentCol));
                         break;
-                    } else
-                    {
-                        break;
-                    } 
-
+                    }
+                    else break;
                 }
+
             }
 
             return moves;
         }
     
-        public override Piece Clone()
-        {
-            var clone = new Queen(this.IsWhite);
-            clone.Row = this.Row; clone.Column = this.Column;
-            return clone;
-        }
-        */
     }
 }
