@@ -21,7 +21,7 @@ namespace Chess.Pieces
             int direction = IsWhite ? -1 : 1;
 
             var currentRow = Row    + direction;
-            var currentCol = Column + direction;
+            var currentCol = Column;
 
             var pieces = manager.pieces;
             var targetSquare = pieces[currentRow, currentCol];

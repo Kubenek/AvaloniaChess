@@ -36,12 +36,13 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        BoardRender.renderBoard(GameBoard);
+        var _board = BoardRender.renderBoard(GameBoard);
 
+        var _controller = new MoveHighlighter();
         ChessManager manager = new ChessManager();
         manager.initializePieces();
 
-        PieceRender.renderPieces(GameBoard, manager.pieces);
+        PieceRender.renderPieces(GameBoard, manager, _board, _controller);
 
     }
 /*

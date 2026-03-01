@@ -14,8 +14,8 @@ namespace Chess.GameManager
         public void initializePieces()
         {
 
-            initializeSide(true);  //* Initialize white pieces
-            initializeSide(false); //* Initialize black pieces
+            initializeSide(true);  // Initialize white pieces
+            initializeSide(false); // Initialize black pieces
 
         }
 

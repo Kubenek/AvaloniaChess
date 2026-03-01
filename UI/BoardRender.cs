@@ -6,7 +6,7 @@ namespace Chess.UI
 {
     public static class BoardRender
     {
-        public static void renderBoard(Grid GameBoard)
+        public static Border[,] renderBoard(Grid GameBoard)
         {
             int size = 8;
 
@@ -34,6 +34,25 @@ namespace Chess.UI
                 }
             }
 
+            return _border;
+
         } 
+
+        public static Border[,] resetRenderedBoard(Border [,] _border)
+        {
+            int size = 8;
+
+            for (int i=0; i<size; i++)
+            {
+                for(int j=0; j<size; j++)
+                {
+
+                    _border[i,j].Background= (i+j) % 2 == 0 ? Brushes.DimGray : Brushes.Gray;
+
+                }
+            }
+            return _border;
+        }
+
     }
 }
