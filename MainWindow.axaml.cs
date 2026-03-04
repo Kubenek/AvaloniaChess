@@ -24,8 +24,8 @@ public partial class MainWindow : Window
 
     private void ExecuteMove(Piece piece, TextBlock pieceVis, int row, int col)
     {
-        PieceRender.movePiece(GameBoard, pieceVis, row, col);  
-        _manager.movePiece(piece, row, col);
+        _render.movePiece(GameBoard, pieceVis, row, col, _manager); //? Moves piece and captures the piece visually  
+        _manager.movePiece(piece, row, col);                        //? Moves piece and captures the piece logically
         _highlighter.clearHighlights(GameBoard);
     }
 

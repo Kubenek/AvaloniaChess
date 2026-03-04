@@ -48,10 +48,20 @@ namespace Chess.GameManager
         {
             pieces[piece.Row, piece.Column] = null;
 
+            var target = fetchPieceAt(row, col);
+
+            if(target is not null) capturePiece(target);
+
             piece.Row    = row;
             piece.Column = col;
 
             pieces[row, col] = piece;
+        }
+
+        public void capturePiece(Piece capturedPiece)
+        {   
+            int row = capturedPiece.Row; int col = capturedPiece.Column;
+            pieces[row, col] = null;
         }
 
         public Piece? fetchPieceAt(int row, int col)

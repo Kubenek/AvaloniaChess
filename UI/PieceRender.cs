@@ -13,6 +13,8 @@ namespace Chess.UI
     {
         public event Action<Piece, TextBlock>? PiecePressed;
 
+        private Dictionary<Piece, TextBlock> _visuals = [];
+
         public void renderPieces(Grid GameBoard, ChessManager manager, Border [,] _board, MoveHighlighter _controller)
         {
 
@@ -30,6 +32,7 @@ namespace Chess.UI
                 Grid.SetColumn (pieceVis, col);
 
                 GameBoard.Children.Add(pieceVis);
+                _visuals[piece] = pieceVis;
 
                 // Create a visual for the piece
                 // Add the piece to the Grid
@@ -57,9 +60,17 @@ namespace Chess.UI
             return pieceVisual;
         }
     
-        public static void movePiece(Grid GameBoard, TextBlock pieceVis, int row, int col)
+        public void movePiece(Grid GameBoard, TextBlock pieceVis, int row, int col, ChessManager _manager)
         {
             GameBoard.Children.Remove(pieceVis);
+
+            var target = _manager.fetchPieceAt(row, col);
+
+            if(target is not null)
+            {
+                TextBlock pieceVisual = _visuals[target];
+                GameBoard.Children.Remove(pieceVisual);
+            }
 
             Grid.SetRow    (pieceVis, row);
             Grid.SetColumn (pieceVis, col);
