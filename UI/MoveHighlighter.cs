@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.ExceptionServices;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Media;
@@ -8,21 +9,14 @@ using Chess.Pieces;
 
 namespace Chess.UI
 {
-    //TODO:
-    //when piece is clicked:
-    //- get piece moves
-    //- iterate through them
-    //- set all of the squares colors to moveable
     public class MoveHighlighter
     {
-        private List<Control> highlightedSquares = [];
+        private Border? [,] highlightedSquares = new Border[8,8];
 
         public event Action<Piece, TextBlock, int, int>? MoveMade;
 
-        public void highlightPieceMoves(Piece piece, ChessManager manager, Grid GameBoard, TextBlock pieceVis)
+        public void highlightPieceMoves(Piece piece, ChessManager manager, Grid GameBoard, TextBlock pieceVis, List<(int, int)> moves)
         {
-            var moves = piece.availableMoves(manager);
-
             foreach(var move in moves)
             {
                 int row = move.Item1; int col = move.Item2;
@@ -42,7 +36,7 @@ namespace Chess.UI
                 Grid.SetColumn(square, col);
 
                 GameBoard.Children.Add(square);
-                highlightedSquares.Add(square);
+                highlightedSquares[row, col] = square;
             }
 
         }
@@ -51,9 +45,21 @@ namespace Chess.UI
         {
             foreach(var hl in highlightedSquares)
             {
-                GameBoard.Children.Remove(hl);
+                if(hl is not null) GameBoard.Children.Remove(hl);
             }
-            highlightedSquares.Clear();
+            Array.Clear(highlightedSquares);
         }
+    
+        public void highlightCaptures(List<(int, int)> positions)
+        {
+            foreach(var pos in positions)
+            {
+                int row = pos.Item1; int col = pos.Item2;
+
+                if(highlightedSquares[row, col] is not null) highlightedSquares[row, col]!.Background = Brushes.Red;
+
+            }
+        }
+
     }
 }

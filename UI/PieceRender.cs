@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Data;
@@ -8,10 +9,11 @@ using Chess.Pieces;
 
 namespace Chess.UI
 {
-    public static class PieceRender
+    public class PieceRender
     {
+        public event Action<Piece, TextBlock>? PiecePressed;
 
-        public static void renderPieces(Grid GameBoard, ChessManager manager, Border [,] _board, MoveHighlighter _controller)
+        public void renderPieces(Grid GameBoard, ChessManager manager, Border [,] _board, MoveHighlighter _controller)
         {
 
             var pieces = manager.pieces;
@@ -35,7 +37,7 @@ namespace Chess.UI
 
         }
 
-        private static TextBlock createPieceVisual(Piece piece, ChessManager manager, Grid GameBoard, MoveHighlighter _controller)
+        private TextBlock createPieceVisual(Piece piece, ChessManager manager, Grid GameBoard, MoveHighlighter _controller)
         {
             var pieceVisual = new TextBlock
             {
@@ -49,8 +51,7 @@ namespace Chess.UI
 
             pieceVisual.PointerPressed += (sender, e) =>
             {
-                _controller.clearHighlights(GameBoard);
-                _controller.highlightPieceMoves(piece, manager, GameBoard, pieceVisual);
+                PiecePressed?.Invoke(piece, pieceVisual);
             };
 
             return pieceVisual;

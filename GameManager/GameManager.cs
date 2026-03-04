@@ -54,5 +54,10 @@ namespace Chess.GameManager
             pieces[row, col] = piece;
         }
 
+        public Piece? fetchPieceAt(int row, int col)
+        {
+            return pieces[row, col];
+        }
+
     }
 }
