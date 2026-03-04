@@ -18,19 +18,15 @@ namespace Chess;
 
 public partial class MainWindow : Window
 {
-    /*
-    private Piece? activePiece = null;
-    private List<Control> moveHighlights = new List<Control>();
-    private Dictionary<Border, IBrush> originalSquareColors = new ();
-    private Dictionary<Border, IBrush> checkHighlights = new ();
-    private Border[,] squares = new Border[8,8];
+    private ChessManager    _manager;
+    private MoveHighlighter _highlighter;
 
-    private bool isWhiteTurn = true;
-
-    private bool isCastlingK = false;
-    private bool isCastlingQ = false;
-
-    */
+    private void ExecuteMove(Piece piece, TextBlock pieceVis, int row, int col)
+    {
+        PieceRender.movePiece(GameBoard, pieceVis, row, col);  
+        _manager.movePiece(piece, row, col);
+        _highlighter.clearHighlights(GameBoard);
+    }
 
     public MainWindow()
     {
@@ -38,11 +34,13 @@ public partial class MainWindow : Window
 
         var _board = BoardRender.renderBoard(GameBoard);
 
-        var _controller = new MoveHighlighter();
-        ChessManager manager = new ChessManager();
-        manager.initializePieces();
+        _manager = new ChessManager();
+        _manager.initializePieces();
 
-        PieceRender.renderPieces(GameBoard, manager, _board, _controller);
+        _highlighter = new MoveHighlighter();
+        _highlighter.MoveMade += ExecuteMove;
+
+        PieceRender.renderPieces(GameBoard, _manager, _board, _highlighter);
 
     }
 /*

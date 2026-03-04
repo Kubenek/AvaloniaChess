@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Media;
@@ -49,11 +50,21 @@ namespace Chess.UI
             pieceVisual.PointerPressed += (sender, e) =>
             {
                 _controller.clearHighlights(GameBoard);
-                _controller.highlightPieceMoves(piece, manager, GameBoard);
+                _controller.highlightPieceMoves(piece, manager, GameBoard, pieceVisual);
             };
 
             return pieceVisual;
         }
     
+        public static void movePiece(Grid GameBoard, TextBlock pieceVis, int row, int col)
+        {
+            GameBoard.Children.Remove(pieceVis);
+
+            Grid.SetRow    (pieceVis, row);
+            Grid.SetColumn (pieceVis, col);
+
+            GameBoard.Children.Add(pieceVis);
+        }
+
     }
 }

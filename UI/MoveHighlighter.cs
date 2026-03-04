@@ -17,7 +17,9 @@ namespace Chess.UI
     {
         private List<Control> highlightedSquares = [];
 
-        public void highlightPieceMoves(Piece piece, ChessManager manager, Grid GameBoard)
+        public event Action<Piece, TextBlock, int, int>? MoveMade;
+
+        public void highlightPieceMoves(Piece piece, ChessManager manager, Grid GameBoard, TextBlock pieceVis)
         {
             var moves = piece.availableMoves(manager);
 
@@ -29,6 +31,11 @@ namespace Chess.UI
                 {
                    Background = (row+col) % 2 == 0 ? Brushes.Green : Brushes.LimeGreen,
                    Opacity = 0.25
+                };
+
+                square.PointerPressed += (sender, e) =>
+                {
+                    MoveMade?.Invoke(piece, pieceVis, row, col);
                 };
 
                 Grid.SetRow(square, row);

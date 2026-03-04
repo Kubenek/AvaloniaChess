@@ -44,5 +44,15 @@ namespace Chess.GameManager
             pieces[row, col] = piece;
         }
 
+        public void movePiece(Piece piece, int row, int col)
+        {
+            pieces[piece.Row, piece.Column] = null;
+
+            piece.Row    = row;
+            piece.Column = col;
+
+            pieces[row, col] = piece;
+        }
+
     }
 }
