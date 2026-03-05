@@ -10,6 +10,7 @@ namespace Chess.GameManager
     {
         
         public Piece? [,] pieces = new Piece[8,8];
+        public bool whiteTurn = true;
 
         public void initializePieces()
         {
@@ -56,6 +57,8 @@ namespace Chess.GameManager
             piece.Column = col;
 
             pieces[row, col] = piece;
+
+            whiteTurn = !whiteTurn;
         }
 
         public void capturePiece(Piece capturedPiece)
