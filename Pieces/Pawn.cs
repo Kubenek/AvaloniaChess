@@ -20,14 +20,20 @@ namespace Chess.Pieces
 
             int direction = IsWhite ? -1 : 1;
 
-            var currentRow = Row    + direction;
+            var currentRow = Row + direction;
             var currentCol = Column;
 
             var pieces = manager.pieces;
             var targetSquare = pieces[currentRow, currentCol];
 
-            if(targetSquare == null)
-                moves.Add((currentRow, currentCol));
+            if(targetSquare == null) moves.Add((currentRow, currentCol));
+            else return moves;
+
+            if(doubleMove)
+            {
+                targetSquare = pieces[currentRow + direction, currentCol];
+                if(targetSquare == null) moves.Add((currentRow + direction, currentCol));
+            }
 
             return moves;
         }

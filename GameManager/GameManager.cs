@@ -48,6 +48,7 @@ namespace Chess.GameManager
         public void movePiece(Piece piece, int row, int col)
         {
             pieces[piece.Row, piece.Column] = null;
+            if(piece is Pawn pawn) pawn.doubleMove = false;
 
             var target = fetchPieceAt(row, col);
 
