@@ -60,6 +60,15 @@ namespace Chess.Pieces
 
             return moves;
         }
-    
+
+        public override Piece Clone()
+        {
+            Queen queen = new(IsWhite);
+            queen.Row = Row;
+            queen.Column = Column;
+
+            return queen;
+        }
+
     }
 }

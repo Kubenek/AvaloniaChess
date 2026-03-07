@@ -57,6 +57,14 @@ namespace Chess.Pieces
             return moves;
         }
 
+        public override Piece Clone()
+        {
+            Bishop bish = new(IsWhite);
+            bish.Row    =    Row;
+            bish.Column = Column;
+
+            return bish;
+        }
 
     }
 }

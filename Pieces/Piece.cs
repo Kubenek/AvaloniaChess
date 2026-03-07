@@ -16,6 +16,7 @@ namespace Chess.Pieces
         public int Column { get; set;}
 
         public abstract List<(int, int)> availableMoves(ChessManager manager);
+        public abstract Piece Clone();
 
     }
 }

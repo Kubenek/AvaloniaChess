@@ -50,6 +50,15 @@ namespace Chess.Pieces
             return moves;
         }
 
+        public override Piece Clone()
+        {
+            Pawn pawn = new(IsWhite);
+            pawn.Row = Row;
+            pawn.Column = Column;
+            pawn.doubleMove = doubleMove;
+
+            return pawn;
+        }
 
     }
 }

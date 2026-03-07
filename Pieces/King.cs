@@ -52,5 +52,15 @@ namespace Chess.Pieces
             return moves;
         }
 
+        public override Piece Clone()
+        {
+            King king = new(IsWhite);
+            king.Row = Row;
+            king.Column = Column;
+            king.hasMoved = hasMoved;
+
+            return king;
+        }
+
     }
 }
