@@ -73,5 +73,41 @@ namespace Chess.GameManager
             return pieces[row, col];
         }
 
+        public King? fetchKing(bool isWhite)
+        {
+            for(int i=0; i<8; i++)
+            {
+                for(int j=0; j<8; j++)
+                {
+                    var piece = pieces[i,j];
+                    if(piece is King king && king.IsWhite == isWhite) return king; 
+                }
+            }
+            return null;
+        }
+
+        public bool isKingInCheck(King king)
+        {
+            int row =    king.Row;
+            int col = king.Column;
+
+            for(int i=0; i<8; i++)
+            {
+                for(int j=0; j<8; j++) {
+                    var piece = pieces[i,j];
+                    if(piece is null) continue;
+                    if(piece.IsWhite == king.IsWhite) continue;
+
+                    var moves = piece.availableMoves(this);
+                    foreach(var move in moves)
+                    {
+                        if(row == move.Item1 && col == move.Item2) return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
     }
 }

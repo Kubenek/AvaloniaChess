@@ -60,6 +60,5 @@ namespace Chess.UI
 
             }
         }
-
     }
 }
