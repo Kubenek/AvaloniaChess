@@ -34,8 +34,8 @@ namespace Chess.GameManager
             createPiece(new Bishop (isWhite), backRow, 2);
             createPiece(new Queen  (isWhite), backRow, 3);
             createPiece(new King   (isWhite), backRow, 4);
-            createPiece(new Knight (isWhite), backRow, 5);
-            createPiece(new Bishop (isWhite), backRow, 6);
+            createPiece(new Bishop (isWhite), backRow, 5);
+            createPiece(new Knight (isWhite), backRow, 6);
             createPiece(new Rook   (isWhite), backRow, 7);
         }
 
@@ -60,6 +60,19 @@ namespace Chess.GameManager
             pieces[row, col] = piece;
 
             whiteTurn = !whiteTurn;
+        }
+
+        public bool isMoveLegal(int fromRow, int fromCol, int toRow, int toCol)
+        {
+            ChessManager simulation = this.Clone();
+            Piece? piece = simulation.pieces[fromRow, fromCol];
+            if(piece is null) return false;
+
+            simulation.movePiece(piece, toRow, toCol);
+
+            King king = simulation.fetchKing(piece.IsWhite)!;
+            
+            return !simulation.isKingInCheck(king);
         }
 
         public void capturePiece(Piece capturedPiece)
@@ -107,6 +120,22 @@ namespace Chess.GameManager
             }
 
             return false;
+        }
+
+        public bool isCheckmate(bool isWhite)
+        {
+            King king = this.fetchKing(isWhite)!;
+            if(!this.isKingInCheck(king)) return false;
+            
+            var pcs = pieces.OfType<Piece>().Where(p => p.IsWhite == isWhite);
+            
+            var hasLegalMove = pcs.Any(piece => 
+                piece.availableMoves(this).Any(move => 
+                    isMoveLegal(piece.Row, piece.Column, move.Item1, move.Item2)
+                )
+            );
+
+            return !hasLegalMove;
         }
 
         public ChessManager Clone()

@@ -31,7 +31,11 @@ public partial class MainWindow : Window
 
         King king = _manager.fetchKing(!piece.IsWhite)!;
 
-        if(_manager.isKingInCheck(king)) _highlighter.highlightCheck(GameBoard, king.Row, king.Column);
+        if(_manager.isKingInCheck(king)) { 
+            _highlighter.highlightCheck(GameBoard, king.Row, king.Column);
+
+            if(_manager.isCheckmate(king.IsWhite)) Components.showCheckmate(piece.IsWhite, CheckmateOverlay, CheckmateText);
+        }
         
         Components.updateTurnText(_manager.whiteTurn, TextWhite, TextBlack);
     }
@@ -49,8 +53,7 @@ public partial class MainWindow : Window
 
         foreach(var move in moves)
         {
-            var clone = _manager.Clone();
-            if(!isMoveLegal(clone, piece.Row, piece.Column, move.Item1, move.Item2)) continue;
+            if(!_manager.isMoveLegal(piece.Row, piece.Column, move.Item1, move.Item2)) continue;
 
             legalMoves.Add(move);
             var target = _manager.fetchPieceAt(move.Item1, move.Item2);
@@ -59,18 +62,6 @@ public partial class MainWindow : Window
 
         _highlighter.highlightPieceMoves(piece, _manager, GameBoard, pieceVis, legalMoves);
         _highlighter.highlightCaptures(captures);
-    }
-
-    private bool isMoveLegal(ChessManager simulation, int fromRow, int fromCol, int toRow, int toCol)
-    {
-        Piece? piece = simulation.pieces[fromRow, fromCol];
-        if(piece is null) return false;
-
-        simulation.movePiece(piece, toRow, toCol);
-
-        King king = simulation.fetchKing(piece.IsWhite)!;
-        
-        return !simulation.isKingInCheck(king);
     }
 
     public MainWindow()
