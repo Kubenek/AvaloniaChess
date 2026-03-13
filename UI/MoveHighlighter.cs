@@ -12,6 +12,7 @@ namespace Chess.UI
     public class MoveHighlighter
     {
         private Border? [,] highlightedSquares = new Border[8,8];
+        private Border? [,] checks             = new Border[8,8];
 
         public event Action<Piece, TextBlock, int, int>? MoveMade;
 
@@ -59,6 +60,31 @@ namespace Chess.UI
                 if(highlightedSquares[row, col] is not null) highlightedSquares[row, col]!.Background = Brushes.Red;
 
             }
+        }
+    
+        public void highlightCheck(Grid GameBoard, int row, int col)
+        {
+            var square = new Border
+            {
+                Background = Brushes.DarkRed,
+                Opacity = 0.5,
+                IsHitTestVisible = false
+            };
+
+            Grid.SetRow(square, row);
+            Grid.SetColumn(square, col);
+
+            GameBoard.Children.Add(square);
+            checks[row, col] = square;
+        }
+    
+        public void clearCheck(Grid GameBoard)
+        {
+            foreach(var hl in checks)
+            {
+                if(hl is not null) GameBoard.Children.Remove(hl);
+            }
+            Array.Clear(checks);
         }
     }
 }

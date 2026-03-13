@@ -27,6 +27,11 @@ public partial class MainWindow : Window
         _render.movePiece(GameBoard, pieceVis, row, col, _manager); //? Moves piece and captures the piece visually  
         _manager.movePiece(piece, row, col);                        //? Moves piece and captures the piece logically
         _highlighter.clearHighlights(GameBoard);
+        _highlighter.clearCheck(GameBoard);
+
+        King king = _manager.fetchKing(!piece.IsWhite)!;
+
+        if(_manager.isKingInCheck(king)) _highlighter.highlightCheck(GameBoard, king.Row, king.Column);
         
         Components.updateTurnText(_manager.whiteTurn, TextWhite, TextBlack);
     }
