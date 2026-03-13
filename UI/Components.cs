@@ -17,5 +17,10 @@ namespace Chess.UI
             CheckmateText.Text = wWin ? "White wins by Checkmate!" : "Black wins by Checkmate!"; 
             CheckmateOverlay.IsVisible = true;
         }
+        public static void showStalemate(Border CheckmateOverlay, TextBlock CheckmateText)
+        {
+            CheckmateText.Text = "Game ends in Stalemate!"; 
+            CheckmateOverlay.IsVisible = true;
+        }
     }
 }

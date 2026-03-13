@@ -138,6 +138,22 @@ namespace Chess.GameManager
             return !hasLegalMove;
         }
 
+        public bool isStalemate(bool isWhite)
+        {
+            King king = this.fetchKing(isWhite)!;
+            if(this.isKingInCheck(king)) return false;
+
+            var pcs = pieces.OfType<Piece>().Where(piece => piece.IsWhite == isWhite);
+
+            var hasLegalMove = pcs.Any(piece => 
+                piece.availableMoves(this).Any(move => 
+                    isMoveLegal(piece.Row, piece.Column, move.Item1, move.Item2)
+                )
+            );
+
+            return !hasLegalMove;
+        }
+
         public ChessManager Clone()
         {
             ChessManager clone = new ();

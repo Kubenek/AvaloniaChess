@@ -33,9 +33,8 @@ public partial class MainWindow : Window
 
         if(_manager.isKingInCheck(king)) { 
             _highlighter.highlightCheck(GameBoard, king.Row, king.Column);
-
             if(_manager.isCheckmate(king.IsWhite)) Components.showCheckmate(piece.IsWhite, CheckmateOverlay, CheckmateText);
-        }
+        } else if(_manager.isStalemate(!piece.IsWhite)) Components.showStalemate(CheckmateOverlay, CheckmateText);
         
         Components.updateTurnText(_manager.whiteTurn, TextWhite, TextBlack);
     }
