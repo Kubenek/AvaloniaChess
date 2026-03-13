@@ -10,21 +10,39 @@
 
         <TextBlock Name="TextBlack" HorizontalAlignment="Center" VerticalAlignment="Top" Text="Black's Turn" Margin="0, 20" FontSize="32" Opacity="0.2"></TextBlock>
         
-        <Grid Width="400" Height="400">
-            <Grid Name="GameBoard"> </Grid>
+        <Grid Width="440" Height="440">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="400"/>
+                <RowDefinition Height="20"/>
+            </Grid.RowDefinitions>
 
-            <Border Name="CheckmateOverlay"
-                    Background="#CC000000"
-                    VerticalAlignment="Center"
-                    Padding="20"
-                    IsVisible="False">
-                    <TextBlock Name="CheckmateText" 
-                               Text="White wins by Checkmate!" 
-                               FontSize="26" 
-                               FontWeight="Bold"
-                               Foreground="White"
-                               TextAlignment="Center"/>
-            </Border>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="20"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Row="0" Grid.Column="1" Name="TopLabels"/>
+            <Grid Grid.Row="2" Grid.Column="1" Name="BottomLabels"/>
+            <Grid Grid.Row="1" Grid.Column="0" Name="LeftLabels"/>
+            <Grid Grid.Row="1" Grid.Column="2" Name="RightLabels"/>
+
+            <Grid Grid.Row="1" Grid.Column="1">
+                <Grid Name="GameBoard"> </Grid>
+                <Border Name="CheckmateOverlay"
+                        Background="#CC000000"
+                        VerticalAlignment="Center"
+                        Padding="20"
+                        IsVisible="False">
+                        <TextBlock Name="CheckmateText" 
+                                Text="White wins by Checkmate!" 
+                                FontSize="26" 
+                                FontWeight="Bold"
+                                Foreground="White"
+                                TextAlignment="Center"/>
+                </Border>
+            </Grid>
         </Grid>
 
         <TextBlock Name="TextWhite" HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="White's Turn" Margin="0, 20" FontSize="32"></TextBlock>

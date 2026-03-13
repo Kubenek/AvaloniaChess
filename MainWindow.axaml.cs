@@ -68,6 +68,7 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         var _board = BoardRender.renderBoard(GameBoard);
+        Components.CreateLabels(TopLabels, LeftLabels, BottomLabels, RightLabels);
 
         _manager = new ChessManager();
         _manager.initializePieces();
