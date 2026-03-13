@@ -38,26 +38,34 @@ public partial class MainWindow : Window
         if(piece.IsWhite != _manager.whiteTurn) return;
 
         var moves = piece.availableMoves(_manager);
-        List<(int, int)> captures = [];
+
+        List<(int, int)> legalMoves = [];
+        List<(int, int)> captures   = [];
 
         foreach(var move in moves)
         {
-            int row = move.Item1; int col = move.Item2;
+            var clone = _manager.Clone();
+            if(!isMoveLegal(clone, piece.Row, piece.Column, move.Item1, move.Item2)) continue;
 
-            var target = _manager.fetchPieceAt(row, col);
-
-            if(target is null) continue;
-            if(target.IsWhite == piece.IsWhite) continue;
-
-            captures.Add(move);
-
-            //? Get piece at location
-            //? Check its color with our piece
-            //? if they are different, add it to captures List
+            legalMoves.Add(move);
+            var target = _manager.fetchPieceAt(move.Item1, move.Item2);
+            if(target != null && target.IsWhite != piece.IsWhite) captures.Add(move);
         }
 
-        _highlighter.highlightPieceMoves(piece, _manager, GameBoard, pieceVis, moves);
+        _highlighter.highlightPieceMoves(piece, _manager, GameBoard, pieceVis, legalMoves);
         _highlighter.highlightCaptures(captures);
+    }
+
+    private bool isMoveLegal(ChessManager simulation, int fromRow, int fromCol, int toRow, int toCol)
+    {
+        Piece? piece = simulation.pieces[fromRow, fromCol];
+        if(piece is null) return false;
+
+        simulation.movePiece(piece, toRow, toCol);
+
+        King king = simulation.fetchKing(piece.IsWhite)!;
+        
+        return !simulation.isKingInCheck(king);
     }
 
     public MainWindow()

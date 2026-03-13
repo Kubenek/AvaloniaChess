@@ -109,5 +109,21 @@ namespace Chess.GameManager
             return false;
         }
 
+        public ChessManager Clone()
+        {
+            ChessManager clone = new ();
+            clone.whiteTurn = whiteTurn;
+
+            for(int i=0; i<8; i++)
+            {
+                for(int j=0; j<8; j++)
+                {
+                    if(pieces[i,j] != null) clone.pieces[i,j] = pieces[i,j]!.Clone();
+                }
+            }
+
+            return clone;
+        }
+
     }
 }
