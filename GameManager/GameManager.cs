@@ -10,6 +10,7 @@ namespace Chess.GameManager
     {
         
         public Piece? [,] pieces = new Piece[8,8];
+        public Piece? lastMovedPiece = null;
         public bool whiteTurn = true;
 
         public void initializePieces()
@@ -47,12 +48,24 @@ namespace Chess.GameManager
 
         public void movePiece(Piece piece, int row, int col)
         {
+            pieces.OfType<Pawn>().ToList().ForEach(p => p.lastMoveDouble = false);
             pieces[piece.Row, piece.Column] = null;
-            if(piece is Pawn pawn) pawn.doubleMove = false;
+
+            if(piece is Pawn pawn) {
+                int distance = Math.Abs(row - pawn.Row);
+                pawn.doubleMove = false;
+
+                if(distance == 2) pawn.lastMoveDouble = true;
+            }
 
             var target = fetchPieceAt(row, col);
 
-            if(target is not null) capturePiece(target);
+            if(piece is Pawn && target is null && piece.Column != col)
+            {
+                Piece cap = fetchPieceAt(piece.Row, col)!;
+                capturePiece(cap);
+            }
+            else if(target is not null) capturePiece(target);
 
             piece.Row    = row;
             piece.Column = col;

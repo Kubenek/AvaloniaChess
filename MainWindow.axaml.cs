@@ -24,7 +24,7 @@ public partial class MainWindow : Window
 
     private void ExecuteMove(Piece piece, TextBlock pieceVis, int row, int col)
     {
-        _render.movePiece(GameBoard, pieceVis, row, col, _manager); //? Moves piece and captures the piece visually  
+        _render.movePiece(GameBoard, pieceVis, piece, row, col, _manager); //? Moves piece and captures the piece visually  
         _manager.movePiece(piece, row, col);                        //? Moves piece and captures the piece logically
         _highlighter.clearHighlights(GameBoard);
         _highlighter.clearCheck(GameBoard);
@@ -59,7 +59,29 @@ public partial class MainWindow : Window
             if(target != null && target.IsWhite != piece.IsWhite) captures.Add(move);
         }
 
-        _highlighter.highlightPieceMoves(piece, _manager, GameBoard, pieceVis, legalMoves);
+        if(piece is Pawn pawn)
+        {
+            for(int i=0; i<2; i++)
+            {
+                int column = (i==0) ? pawn.Column - 1 : pawn.Column + 1;
+                int row = pawn.Row;
+
+                if(column < 0 || column >= 8) continue;
+                
+                var target = _manager.fetchPieceAt(row, column);
+                if(target != null && target.IsWhite != piece.IsWhite && target is Pawn epawn && epawn.lastMoveDouble)
+                {
+                    int r = pawn.IsWhite ? pawn.Row - 1 : pawn.Row + 1;
+                    int c = column;
+
+                    if(!_manager.isMoveLegal(row, column, r, c)) continue;       
+                    legalMoves.Add((r, c)); captures.Add((r, c));
+                }
+                
+            }
+        }
+
+        _highlighter.highlightPieceMoves(piece, GameBoard, pieceVis, legalMoves);
         _highlighter.highlightCaptures(captures);
     }
 

@@ -60,7 +60,7 @@ namespace Chess.UI
             return pieceVisual;
         }
     
-        public void movePiece(Grid GameBoard, TextBlock pieceVis, int row, int col, ChessManager _manager)
+        public void movePiece(Grid GameBoard, TextBlock pieceVis, Piece piece, int row, int col, ChessManager _manager)
         {
             GameBoard.Children.Remove(pieceVis);
 
@@ -70,6 +70,11 @@ namespace Chess.UI
             {
                 TextBlock pieceVisual = _visuals[target];
                 GameBoard.Children.Remove(pieceVisual);
+            } else if(target is null && piece is Pawn && piece.Column != col)
+            {
+                Piece capPawn = _manager.fetchPieceAt(piece.Row, col)!;
+                TextBlock vis = _visuals[capPawn];
+                GameBoard.Children.Remove(vis);
             }
 
             Grid.SetRow    (pieceVis, row);

@@ -16,7 +16,7 @@ namespace Chess.UI
 
         public event Action<Piece, TextBlock, int, int>? MoveMade;
 
-        public void highlightPieceMoves(Piece piece, ChessManager manager, Grid GameBoard, TextBlock pieceVis, List<(int, int)> moves)
+        public void highlightPieceMoves(Piece piece, Grid GameBoard, TextBlock pieceVis, List<(int, int)> moves)
         {
             foreach(var move in moves)
             {

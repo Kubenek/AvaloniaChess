@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Chess.GameManager;
 
 namespace Chess.UI
 {
@@ -23,6 +24,20 @@ namespace Chess.UI
             CheckmateText.Text = "Game ends in Stalemate!"; 
             CheckmateOverlay.IsVisible = true;
         }
+
+        private static TextBlock makeLabel(string text, int ft)
+        {
+            var label = new TextBlock
+            {
+                Text = text,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                FontSize = ft
+            };
+
+            return label;
+        }
+
         public static void CreateLabels(Grid top, Grid left, Grid bottom, Grid right)
         {
             for(int i=0; i<8; i++)
@@ -30,21 +45,10 @@ namespace Chess.UI
                 top.   ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
                 bottom.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
 
-                var tLabel = new TextBlock
-                {
-                    Text = ((char)('a' + i)).ToString(),
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = 14
-                };
+                var ch = ((char)('a' + i)).ToString();
 
-                var bLabel = new TextBlock
-                {
-                    Text = ((char)('a' + i)).ToString(),
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = 14
-                };
+                var tLabel = makeLabel(ch, 14);
+                var bLabel = makeLabel(ch, 14);
 
                 Grid.SetColumn(tLabel, i);
                 Grid.SetColumn(bLabel, i);
@@ -59,21 +63,10 @@ namespace Chess.UI
                 left. RowDefinitions.Add(new RowDefinition(GridLength.Star));
                 right.RowDefinitions.Add(new RowDefinition(GridLength.Star));
 
-                var lLabel = new TextBlock
-                {
-                    Text = (8 - i).ToString(),
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = 14
-                };
-
-                var rLabel = new TextBlock
-                {
-                    Text = (8 - i).ToString(),
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = 14
-                };
+                var ch = (8 - i).ToString();
+                
+                var lLabel = makeLabel(ch, 14);
+                var rLabel = makeLabel(ch, 14);
 
                 Grid.SetRow(lLabel, i);
                 Grid.SetRow(rLabel, i);

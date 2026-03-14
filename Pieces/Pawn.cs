@@ -13,6 +13,7 @@ namespace Chess.Pieces
         }
 
         public bool doubleMove = true;
+        public bool lastMoveDouble = false;
 
         public override List<(int, int)> availableMoves(ChessManager manager) 
         {
@@ -56,6 +57,7 @@ namespace Chess.Pieces
             pawn.Row = Row;
             pawn.Column = Column;
             pawn.doubleMove = doubleMove;
+            pawn.lastMoveDouble = lastMoveDouble;
 
             return pawn;
         }
