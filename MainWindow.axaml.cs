@@ -74,7 +74,7 @@ public partial class MainWindow : Window
                     int r = pawn.IsWhite ? pawn.Row - 1 : pawn.Row + 1;
                     int c = column;
 
-                    if(!_manager.isMoveLegal(row, column, r, c)) continue;       
+                    if(!_manager.isMoveLegal(row, pawn.Column, r, c)) continue;       
                     legalMoves.Add((r, c)); captures.Add((r, c));
                 }
                 
