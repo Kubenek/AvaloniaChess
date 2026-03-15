@@ -61,6 +61,7 @@ public partial class MainWindow : Window
         MoveEntry entry = new(move, player);
 
         MoveList.Items.Insert(0, entry);
+        MoveList.SelectedIndex = 0;
     }
 
     private void ExecuteMove(Piece piece, TextBlock pieceVis, int row, int col)

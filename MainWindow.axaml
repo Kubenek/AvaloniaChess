@@ -7,6 +7,18 @@
         Title="Chess"
         Width="1000" Height="600">
 
+    <Window.Styles>
+        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="#33000000"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected:focus /template/ ContentPresenter">
+            <Setter Property="Background" Value="#33000000"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#44000000"/>
+        </Style>
+    </Window.Styles>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
