@@ -13,8 +13,21 @@ using System.Linq;
 using Chess.UI;
 using Chess.GameManager;
 using Chess.Pieces;
+using Avalonia.Markup.Xaml.Styling;
 
 namespace Chess;
+
+public class MoveEntry
+{
+    public string move   { get; set; }
+    public string player { get; set; }
+
+    public MoveEntry(string _move, string _player)
+    {
+        move   = _move;
+        player = _player;
+    }
+}
 
 public partial class MainWindow : Window
 {
@@ -29,6 +42,7 @@ public partial class MainWindow : Window
 
         string ch = isMate ? "#" : (isCheck ? "+" : "");
         string cap = capture ? "x" : "";
+        string player = piece.IsWhite ? "White" : "Black";
 
         int rank = 8 - toRow;
 
@@ -44,7 +58,9 @@ public partial class MainWindow : Window
             _ => ""
         };
 
-        MoveList.Items.Insert(0, move);
+        MoveEntry entry = new(move, player);
+
+        MoveList.Items.Insert(0, entry);
     }
 
     private void ExecuteMove(Piece piece, TextBlock pieceVis, int row, int col)
