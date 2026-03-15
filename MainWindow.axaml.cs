@@ -22,21 +22,57 @@ public partial class MainWindow : Window
     private MoveHighlighter _highlighter;
     private PieceRender     _render;
 
+    private void LogMove(Piece piece, int fromCol, int toRow, int toCol, bool capture, bool isCheck, bool isMate)
+    {
+        char column = (char)('a' + toCol);
+        char fromColumn = (char)('a' + fromCol);
+
+        string ch = isMate ? "#" : (isCheck ? "+" : "");
+        string cap = capture ? "x" : "";
+
+        int rank = 8 - toRow;
+
+        string template = $"{cap}{column}{rank}{ch}";
+        string move = piece switch
+        {
+            Pawn => (capture ? $"{fromColumn}x" : "") + $"{column}{rank}{ch}",
+            Bishop =>  "B" + template, 
+            Rook =>  "R" + template, 
+            Queen =>  "Q" + template,
+            Knight =>  "N" + template,
+            King =>  "K" + template,
+            _ => ""
+        };
+
+        MoveList.Items.Insert(0, move);
+    }
+
     private void ExecuteMove(Piece piece, TextBlock pieceVis, int row, int col)
     {
+        int ogCol = piece.Column;
+        bool cap = false;
+        bool check = false;
+        bool mate = false;
+
         _render.movePiece(GameBoard, pieceVis, piece, row, col, _manager); //? Moves piece and captures the piece visually  
-        _manager.movePiece(piece, row, col);                        //? Moves piece and captures the piece logically
+        cap = _manager.movePiece(piece, row, col);                         //? Moves piece and captures the piece logically
         _highlighter.clearHighlights(GameBoard);
         _highlighter.clearCheck(GameBoard);
 
         King king = _manager.fetchKing(!piece.IsWhite)!;
 
         if(_manager.isKingInCheck(king)) { 
+            check = true;
             _highlighter.highlightCheck(GameBoard, king.Row, king.Column);
-            if(_manager.isCheckmate(king.IsWhite)) Components.showCheckmate(piece.IsWhite, CheckmateOverlay, CheckmateText);
+
+            if(_manager.isCheckmate(king.IsWhite)) {
+                mate = true;
+                Components.showCheckmate(piece.IsWhite, CheckmateOverlay, CheckmateText);
+            }
         } else if(_manager.isStalemate(!piece.IsWhite)) Components.showStalemate(CheckmateOverlay, CheckmateText);
         
         Components.updateTurnText(_manager.whiteTurn, TextWhite, TextBlack);
+        LogMove(piece, ogCol, row, col, cap, check, mate);
     }
 
     private void PieceClicked(Piece piece, TextBlock pieceVis)

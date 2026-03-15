@@ -46,8 +46,10 @@ namespace Chess.GameManager
             pieces[row, col] = piece;
         }
 
-        public void movePiece(Piece piece, int row, int col)
+        public bool movePiece(Piece piece, int row, int col)
         {
+            bool capture = false;
+
             pieces.OfType<Pawn>().ToList().ForEach(p => p.lastMoveDouble = false);
             pieces[piece.Row, piece.Column] = null;
 
@@ -64,15 +66,20 @@ namespace Chess.GameManager
             {
                 Piece cap = fetchPieceAt(piece.Row, col)!;
                 capturePiece(cap);
+                capture = true;
             }
-            else if(target is not null) capturePiece(target);
+            else if(target is not null)
+            {
+                capturePiece(target); capture = true;
+            }
 
             piece.Row    = row;
             piece.Column = col;
 
             pieces[row, col] = piece;
-
             whiteTurn = !whiteTurn;
+
+            return capture;
         }
 
         public bool isMoveLegal(int fromRow, int fromCol, int toRow, int toCol)

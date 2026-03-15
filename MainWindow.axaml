@@ -6,47 +6,80 @@
         Title="Chess"
         Width="1000" Height="600">
 
-    <StackPanel VerticalAlignment="Center">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <TextBlock Name="TextBlack" HorizontalAlignment="Center" VerticalAlignment="Top" Text="Black's Turn" Margin="0, 20" FontSize="32" Opacity="0.2"></TextBlock>
-        
-        <Grid Width="440" Height="440">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="20"/>
-                <RowDefinition Height="400"/>
-                <RowDefinition Height="20"/>
-            </Grid.RowDefinitions>
+        <StackPanel Grid.Column="2" VerticalAlignment="Center">
+            <TextBlock Name="TextBlack" HorizontalAlignment="Center" VerticalAlignment="Top" Text="Black's Turn" Margin="0, 20" FontSize="32" Opacity="0.2"></TextBlock>
+            
+            <Grid Width="440" Height="440">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="400"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="20"/>
-                <ColumnDefinition Width="400"/>
-                <ColumnDefinition Width="20"/>
-            </Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="400"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
 
-            <Grid Grid.Row="0" Grid.Column="1" Name="TopLabels"/>
-            <Grid Grid.Row="2" Grid.Column="1" Name="BottomLabels"/>
-            <Grid Grid.Row="1" Grid.Column="0" Name="LeftLabels"/>
-            <Grid Grid.Row="1" Grid.Column="2" Name="RightLabels"/>
+                <Grid Grid.Row="0" Grid.Column="1" Name="TopLabels"/>
+                <Grid Grid.Row="2" Grid.Column="1" Name="BottomLabels"/>
+                <Grid Grid.Row="1" Grid.Column="0" Name="LeftLabels"/>
+                <Grid Grid.Row="1" Grid.Column="2" Name="RightLabels"/>
 
-            <Grid Grid.Row="1" Grid.Column="1">
-                <Grid Name="GameBoard"> </Grid>
-                <Border Name="CheckmateOverlay"
-                        Background="#CC000000"
-                        VerticalAlignment="Center"
-                        Padding="20"
-                        IsVisible="False">
-                        <TextBlock Name="CheckmateText" 
-                                Text="White wins by Checkmate!" 
-                                FontSize="26" 
-                                FontWeight="Bold"
-                                Foreground="White"
-                                TextAlignment="Center"/>
-                </Border>
+                <Grid Grid.Row="1" Grid.Column="1">
+                    <Grid Name="GameBoard"> </Grid>
+                    <Border Name="CheckmateOverlay"
+                            Background="#CC000000"
+                            VerticalAlignment="Center"
+                            Padding="20"
+                            IsVisible="False">
+                            <TextBlock Name="CheckmateText" 
+                                    Text="White wins by Checkmate!" 
+                                    FontSize="26" 
+                                    FontWeight="Bold"
+                                    Foreground="White"
+                                    TextAlignment="Center"/>
+                    </Border>
+                </Grid>
             </Grid>
+
+            <TextBlock Name="TextWhite" HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="White's Turn" Margin="0, 20" FontSize="32"></TextBlock>
+        </StackPanel>
+
+        <Grid Grid.Column="3" Margin="40,0,0,0" Height="440" VerticalAlignment="Center">
+            <Grid>  
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="400"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Move" Height="20" FontSize="12" FontWeight="Bold"/>
+                    <TextBlock Grid.Column="1" Text="Player" Height="20" FontSize="12" FontWeight="Bold"/>
+                </Grid>
+            </Grid>
+
+            <ListBox Name="MoveList" Height="400" Grid.Row="1"/>
+
         </Grid>
 
-        <TextBlock Name="TextWhite" HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="White's Turn" Margin="0, 20" FontSize="32"></TextBlock>
-
-    </StackPanel>
+    </Grid>
 
 </Window>
