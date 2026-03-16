@@ -14,6 +14,7 @@ using Chess.UI;
 using Chess.GameManager;
 using Chess.Pieces;
 using Avalonia.Markup.Xaml.Styling;
+using System.Threading.Tasks;
 
 namespace Chess;
 
@@ -22,6 +23,8 @@ public partial class MainWindow : Window
     private ChessManager    _manager;
     private MoveHighlighter _highlighter;
     private PieceRender     _render;
+
+    private TaskCompletionSource<PieceType>? _promotionChoice;
 
     private void LogMove(Piece piece, int fromCol, int toRow, int toCol, bool capture, bool isCheck, bool isMate)
     {
@@ -52,10 +55,13 @@ public partial class MainWindow : Window
         MoveList.SelectedIndex = 0;
     }
 
-    private void PromotePawn(Pawn pawn)
+    private async void PromotePawn(Pawn pawn)
     {
-        //* Call UI method for prompting and get response
-        PieceType type = PieceType.Queen;
+        Components.showPromotionOverlay(PromotionOverlay);
+
+        _promotionChoice = new TaskCompletionSource<PieceType>();
+        PieceType type = await _promotionChoice.Task;
+
         bool isWhite = pawn.IsWhite;
 
         Piece piece = type switch 
@@ -74,6 +80,17 @@ public partial class MainWindow : Window
 
         _manager.pieces[row, col] = piece;
         _render.updatePieceVisual(GameBoard, pawn, piece);
+
+        Components.hidePromotionOverlay(PromotionOverlay);
+
+    }
+
+    private void PromotionSetup()
+    {
+        PromoteQueen.Click  += (s, e) => _promotionChoice?.SetResult(PieceType.Queen);
+        PromoteBishop.Click += (s, e) => _promotionChoice?.SetResult(PieceType.Bishop);
+        PromoteKnight.Click += (s, e) => _promotionChoice?.SetResult(PieceType.Knight);
+        PromoteRook.Click   += (s, e) => _promotionChoice?.SetResult(PieceType.Rook);
     }
 
     private (bool isCheck, bool isMate, bool isStalemate) EvaluateGame(bool isWhite)
@@ -161,6 +178,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        PromotionSetup();
 
         BoardRender.renderBoard(GameBoard);
         Components.CreateLabels(TopLabels, LeftLabels, BottomLabels, RightLabels);
