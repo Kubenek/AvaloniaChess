@@ -17,18 +17,6 @@ using Avalonia.Markup.Xaml.Styling;
 
 namespace Chess;
 
-public class MoveEntry
-{
-    public string move   { get; set; }
-    public string player { get; set; }
-
-    public MoveEntry(string _move, string _player)
-    {
-        move   = _move;
-        player = _player;
-    }
-}
-
 public partial class MainWindow : Window
 {
     private ChessManager    _manager;
@@ -64,6 +52,30 @@ public partial class MainWindow : Window
         MoveList.SelectedIndex = 0;
     }
 
+    private void PromotePawn(Pawn pawn)
+    {
+        //* Call UI method for prompting and get response
+        PieceType type = PieceType.Queen;
+        bool isWhite = pawn.IsWhite;
+
+        Piece piece = type switch 
+        {
+            PieceType.Queen  => new   Queen(isWhite),
+            PieceType.Rook   => new    Rook(isWhite),
+            PieceType.Knight => new  Knight(isWhite),
+            PieceType.Bishop => new  Bishop(isWhite),
+            _                => new   Queen(isWhite)
+        };
+
+        int row = pawn.Row; int col = pawn.Column;
+        _manager.pieces[row, col] = null;
+
+        piece.Row = row; piece.Column = col;
+
+        _manager.pieces[row, col] = piece;
+        _render.updatePieceVisual(GameBoard, pawn, piece);
+    }
+
     private (bool isCheck, bool isMate, bool isStalemate) EvaluateGame(bool isWhite)
     {
         King king = _manager.fetchKing(isWhite)
@@ -87,16 +99,16 @@ public partial class MainWindow : Window
         var (isCheck, isMate, isStalemate) = EvaluateGame(!piece.IsWhite);
         King king = _manager.fetchKing(!piece.IsWhite)!;
 
+
         if(isCheck) 
             _highlighter.highlightCheck(GameBoard, king.Row, king.Column);
-
         if(isMate)
             Components.showCheckmate(piece.IsWhite, CheckmateOverlay, CheckmateText);
         else if(isStalemate)
             Components.showStalemate(CheckmateOverlay, CheckmateText);
+
         
         Components.updateTurnText(_manager.whiteTurn, TextWhite, TextBlack);
-
         LogMove(piece, ogCol, row, col, cap, isCheck, isMate);
     }
 
@@ -150,17 +162,18 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        var _board = BoardRender.renderBoard(GameBoard);
+        BoardRender.renderBoard(GameBoard);
         Components.CreateLabels(TopLabels, LeftLabels, BottomLabels, RightLabels);
 
         _manager = new ChessManager();
         _manager.initializePieces();
+        _manager.Promotion += PromotePawn;
 
         _highlighter = new MoveHighlighter();
         _highlighter.MoveMade += ExecuteMove;
 
         _render = new PieceRender();
-        _render.renderPieces(GameBoard, _manager, _board, _highlighter);
+        _render.renderPieces(GameBoard, _manager);
         _render.PiecePressed += PieceClicked;
 
     }

@@ -13,6 +13,8 @@ namespace Chess.GameManager
         public Piece? lastMovedPiece = null;
         public bool whiteTurn = true;
 
+        public event Action<Pawn>? Promotion;
+
         public void initializePieces()
         {
 
@@ -56,7 +58,6 @@ namespace Chess.GameManager
             if(piece is Pawn pawn) {
                 int distance = Math.Abs(row - pawn.Row);
                 pawn.doubleMove = false;
-
                 if(distance == 2) pawn.lastMoveDouble = true;
             }
 
@@ -75,9 +76,15 @@ namespace Chess.GameManager
 
             piece.Row    = row;
             piece.Column = col;
-
             pieces[row, col] = piece;
+
+            if(piece is Pawn p && (row == 0 || row == 7))
+            {
+                Promotion?.Invoke(p);
+            }
+
             whiteTurn = !whiteTurn;
+
 
             return capture;
         }

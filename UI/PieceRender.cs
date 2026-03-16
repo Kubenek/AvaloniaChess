@@ -15,7 +15,7 @@ namespace Chess.UI
 
         private Dictionary<Piece, TextBlock> _visuals = [];
 
-        public void renderPieces(Grid GameBoard, ChessManager manager, Border [,] _board, MoveHighlighter _controller)
+        public void renderPieces(Grid GameBoard, ChessManager manager)
         {
 
             var pieces = manager.pieces;
@@ -23,7 +23,7 @@ namespace Chess.UI
             foreach(var piece in pieces)
             {
                 if(piece is null) continue;
-                TextBlock pieceVis = createPieceVisual(piece, manager, GameBoard, _controller);
+                TextBlock pieceVis = createPieceVisual(piece);
 
                 int row = piece.Row; 
                 int col = piece.Column;
@@ -40,7 +40,7 @@ namespace Chess.UI
 
         }
 
-        private TextBlock createPieceVisual(Piece piece, ChessManager manager, Grid GameBoard, MoveHighlighter _controller)
+        private TextBlock createPieceVisual(Piece piece)
         {
             var pieceVisual = new TextBlock
             {
@@ -81,6 +81,22 @@ namespace Chess.UI
             Grid.SetColumn (pieceVis, col);
 
             GameBoard.Children.Add(pieceVis);
+        }
+
+        public void updatePieceVisual(Grid GameBoard, Piece piece, Piece newPiece)
+        {
+            TextBlock pVis = _visuals[piece];
+            GameBoard.Children.Remove(pVis);
+            _visuals.Remove(piece);
+
+            int row = piece.Row; int col = piece.Column;
+
+            TextBlock pieceVisual = createPieceVisual(newPiece);
+            _visuals[newPiece] = pieceVisual;
+
+            Grid.SetRow   (pieceVisual, row);
+            Grid.SetColumn(pieceVisual, col);
+            GameBoard.Children.Add(pieceVisual);
         }
 
     }
