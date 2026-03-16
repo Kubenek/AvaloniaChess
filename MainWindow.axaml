@@ -3,6 +3,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Chess"
+
+        xmlns:comp="clr-namespace:Chess.Modules"
+
         x:Class="Chess.MainWindow"
         Title="Chess"
         Width="1000" Height="600">
@@ -65,63 +68,8 @@
                                     TextAlignment="Center"/>
                     </Border>
 
-                    <Border Name="PromotionOverlay"
-                            Background="Transparent"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            IsVisible="False"
-                            IsHitTestVisible="True">
-                            
-                        <Border Background="#CC000000"
-                                Height="350" Width="350"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
+                    <comp:Promotion Name="PromotionDialog"/>
 
-                            <StackPanel Orientation="Vertical">
-
-                                <TextBlock Text="Choose your pawn promotion:" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="20" Margin="0, 20"/>
-
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
-
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <Button Grid.Row="0" Grid.Column="0" 
-                                            Name="PromoteQueen"
-                                            HorizontalAlignment="Right"
-                                            Content="♛" 
-                                            FontSize="60"
-                                            Margin="10"/>
-                                    
-                                    <Button Grid.Row="0" Grid.Column="1" 
-                                            Name="PromoteRook"
-                                            Content="♜" 
-                                            FontSize="60"
-                                            Margin="10"/>
-                                    
-                                    <Button Grid.Row="1" Grid.Column="0" 
-                                            Name="PromoteBishop"
-                                            HorizontalAlignment="Right"
-                                            Content="♝" 
-                                            FontSize="60"
-                                            Margin="10"/>
-                                    
-                                    <Button Grid.Row="1" Grid.Column="1" 
-                                            Name="PromoteKnight"
-                                            Content="♞" 
-                                            FontSize="60"
-                                            Margin="10"/>
-
-                                </Grid>
-                            </StackPanel>
-                        </Border>
-                    </Border>
                 </Grid>
             </Grid>
 

@@ -15,6 +15,7 @@ using Chess.GameManager;
 using Chess.Pieces;
 using Avalonia.Markup.Xaml.Styling;
 using System.Threading.Tasks;
+using Chess.Modules;
 
 namespace Chess;
 
@@ -57,7 +58,7 @@ public partial class MainWindow : Window
 
     private async void PromotePawn(Pawn pawn)
     {
-        Components.showPromotionOverlay(PromotionOverlay);
+        PromotionDialog.Show();
 
         _promotionChoice = new TaskCompletionSource<PieceType>();
         PieceType type = await _promotionChoice.Task;
@@ -81,16 +82,8 @@ public partial class MainWindow : Window
         _manager.pieces[row, col] = piece;
         _render.updatePieceVisual(GameBoard, pawn, piece);
 
-        Components.hidePromotionOverlay(PromotionOverlay);
+        PromotionDialog.Hide();
 
-    }
-
-    private void PromotionSetup()
-    {
-        PromoteQueen.Click  += (s, e) => _promotionChoice?.SetResult(PieceType.Queen);
-        PromoteBishop.Click += (s, e) => _promotionChoice?.SetResult(PieceType.Bishop);
-        PromoteKnight.Click += (s, e) => _promotionChoice?.SetResult(PieceType.Knight);
-        PromoteRook.Click   += (s, e) => _promotionChoice?.SetResult(PieceType.Rook);
     }
 
     private (bool isCheck, bool isMate, bool isStalemate) EvaluateGame(bool isWhite)
@@ -178,7 +171,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        PromotionSetup();
+
+        PromotionDialog._promotionChoice += onPromotionChoice;
 
         BoardRender.renderBoard(GameBoard);
         Components.CreateLabels(TopLabels, LeftLabels, BottomLabels, RightLabels);
@@ -194,6 +188,11 @@ public partial class MainWindow : Window
         _render.renderPieces(GameBoard, _manager);
         _render.PiecePressed += PieceClicked;
 
+    }
+
+    private void onPromotionChoice(PieceType type)
+    {
+        _promotionChoice?.SetResult(type);
     }
 
 }

@@ -24,14 +24,6 @@ namespace Chess.UI
             CheckmateText.Text = "Game ends in Stalemate!"; 
             CheckmateOverlay.IsVisible = true;
         }
-        public static void showPromotionOverlay(Border PromotionOverlay)
-        {
-            PromotionOverlay.IsVisible = true;
-        }
-        public static void hidePromotionOverlay(Border PromotionOverlay)
-        {
-            PromotionOverlay.IsVisible = false;
-        }
 
         private static TextBlock makeLabel(string text, int ft)
         {
