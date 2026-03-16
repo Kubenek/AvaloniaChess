@@ -64,32 +64,40 @@ public partial class MainWindow : Window
         MoveList.SelectedIndex = 0;
     }
 
+    private (bool isCheck, bool isMate, bool isStalemate) EvaluateGame(bool isWhite)
+    {
+        King king = _manager.fetchKing(isWhite)
+        !;
+        bool check     =           _manager.isKingInCheck(king);
+        bool mate      =  check && _manager.isCheckmate(isWhite);
+        bool stalemate = !check && _manager.isStalemate(isWhite);
+
+        return (check, mate, stalemate);
+    }
+
     private void ExecuteMove(Piece piece, TextBlock pieceVis, int row, int col)
     {
         int ogCol = piece.Column;
-        bool cap = false;
-        bool check = false;
-        bool mate = false;
 
         _render.movePiece(GameBoard, pieceVis, piece, row, col, _manager); //? Moves piece and captures the piece visually  
-        cap = _manager.movePiece(piece, row, col);                         //? Moves piece and captures the piece logically
+        bool cap = _manager.movePiece(piece, row, col);                    //? Moves piece and captures the piece logically
         _highlighter.clearHighlights(GameBoard);
         _highlighter.clearCheck(GameBoard);
 
+        var (isCheck, isMate, isStalemate) = EvaluateGame(!piece.IsWhite);
         King king = _manager.fetchKing(!piece.IsWhite)!;
 
-        if(_manager.isKingInCheck(king)) { 
-            check = true;
+        if(isCheck) 
             _highlighter.highlightCheck(GameBoard, king.Row, king.Column);
 
-            if(_manager.isCheckmate(king.IsWhite)) {
-                mate = true;
-                Components.showCheckmate(piece.IsWhite, CheckmateOverlay, CheckmateText);
-            }
-        } else if(_manager.isStalemate(!piece.IsWhite)) Components.showStalemate(CheckmateOverlay, CheckmateText);
+        if(isMate)
+            Components.showCheckmate(piece.IsWhite, CheckmateOverlay, CheckmateText);
+        else if(isStalemate)
+            Components.showStalemate(CheckmateOverlay, CheckmateText);
         
         Components.updateTurnText(_manager.whiteTurn, TextWhite, TextBlack);
-        LogMove(piece, ogCol, row, col, cap, check, mate);
+
+        LogMove(piece, ogCol, row, col, cap, isCheck, isMate);
     }
 
     private void PieceClicked(Piece piece, TextBlock pieceVis)
