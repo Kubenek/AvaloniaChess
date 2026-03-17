@@ -55,18 +55,7 @@
                 <Grid Grid.Row="1" Grid.Column="1">
                     <Grid Name="GameBoard"> </Grid>
 
-                    <Border Name="CheckmateOverlay"
-                            Background="#CC000000"
-                            VerticalAlignment="Center"
-                            Padding="20"
-                            IsVisible="False">
-                            <TextBlock Name="CheckmateText" 
-                                    Text="White wins by Checkmate!" 
-                                    FontSize="26" 
-                                    FontWeight="Bold"
-                                    Foreground="White"
-                                    TextAlignment="Center"/>
-                    </Border>
+                    <comp:OvCheckmate Name="CheckmateOverlay"/>
 
                     <comp:Promotion Name="PromotionDialog"/>
 

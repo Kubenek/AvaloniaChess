@@ -112,10 +112,15 @@ public partial class MainWindow : Window
 
         if(isCheck) 
             _highlighter.highlightCheck(GameBoard, king.Row, king.Column);
-        if(isMate)
-            Components.showCheckmate(piece.IsWhite, CheckmateOverlay, CheckmateText);
-        else if(isStalemate)
-            Components.showStalemate(CheckmateOverlay, CheckmateText);
+        if(isMate) {
+            string player = piece.IsWhite ? "White" : "Black";
+            CheckmateOverlay.setText($"{player} wins by Checkmate!");
+            CheckmateOverlay.Show();
+        }
+        else if(isStalemate) {
+            CheckmateOverlay.setText("Game ends in Stalemate!");
+            CheckmateOverlay.Show();
+        }
 
         
         Components.updateTurnText(_manager.whiteTurn, TextWhite, TextBlack);
@@ -171,7 +176,6 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-
         PromotionDialog._promotionChoice += onPromotionChoice;
 
         BoardRender.renderBoard(GameBoard);
