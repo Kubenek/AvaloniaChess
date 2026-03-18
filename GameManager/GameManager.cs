@@ -81,6 +81,7 @@ namespace Chess.GameManager
             if(piece is Pawn p && (row == 0 || row == 7))
             {
                 Promotion?.Invoke(p);
+                return capture;
             }
 
             whiteTurn = !whiteTurn;

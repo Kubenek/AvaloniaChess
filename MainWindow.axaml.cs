@@ -85,7 +85,10 @@ public partial class MainWindow : Window
         _render.updatePieceVisual(GameBoard, pawn, piece);
 
         _isPromoting = false;
+        _manager.whiteTurn = !_manager.whiteTurn;
+
         PromotionDialog.Hide();
+        Components.updateTurnText(_manager.whiteTurn, TextWhite, TextBlack);
     }
 
     private (bool isCheck, bool isMate, bool isStalemate) EvaluateGame(bool isWhite)
@@ -124,7 +127,6 @@ public partial class MainWindow : Window
             CheckmateOverlay.Show();
         }
 
-        
         Components.updateTurnText(_manager.whiteTurn, TextWhite, TextBlack);
         LogMove(piece, ogCol, row, col, cap, isCheck, isMate);
     }
