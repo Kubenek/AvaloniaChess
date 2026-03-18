@@ -26,6 +26,7 @@ public partial class MainWindow : Window
     private PieceRender     _render;
 
     private TaskCompletionSource<PieceType>? _promotionChoice;
+    private bool _isPromoting = false;
 
     private void LogMove(Piece piece, int fromCol, int toRow, int toCol, bool capture, bool isCheck, bool isMate)
     {
@@ -58,7 +59,8 @@ public partial class MainWindow : Window
 
     private async void PromotePawn(Pawn pawn)
     {
-        PromotionDialog.Show();
+        PromotionDialog.Show(pawn.IsWhite);
+        _isPromoting = true;
 
         _promotionChoice = new TaskCompletionSource<PieceType>();
         PieceType type = await _promotionChoice.Task;
@@ -82,8 +84,8 @@ public partial class MainWindow : Window
         _manager.pieces[row, col] = piece;
         _render.updatePieceVisual(GameBoard, pawn, piece);
 
+        _isPromoting = false;
         PromotionDialog.Hide();
-
     }
 
     private (bool isCheck, bool isMate, bool isStalemate) EvaluateGame(bool isWhite)
@@ -129,6 +131,7 @@ public partial class MainWindow : Window
 
     private void PieceClicked(Piece piece, TextBlock pieceVis)
     {
+        if(_isPromoting) return;
         _highlighter.clearHighlights(GameBoard);
 
         if(piece.IsWhite != _manager.whiteTurn) return;

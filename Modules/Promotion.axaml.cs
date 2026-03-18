@@ -30,8 +30,15 @@ public partial class Promotion : UserControl
         PromoteRook.Click   += (s, e) => _promotionChoice?.Invoke(PieceType.Rook);
     }
 
-    public void Show() 
+    public void Show(bool isWhite) 
     {
+        var color = isWhite ? Brushes.White : Brushes.Black;
+
+        PromoteQueen.Foreground  = color;
+        PromoteRook.Foreground   = color;
+        PromoteBishop.Foreground = color;
+        PromoteKnight.Foreground = color;
+
         PromotionOverlay.IsVisible = true;
     }
     public void Hide()
