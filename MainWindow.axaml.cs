@@ -84,6 +84,10 @@ public partial class MainWindow : Window
         _manager.pieces[row, col] = piece;
         _render.updatePieceVisual(GameBoard, pawn, piece);
 
+        King eKing = _manager.fetchKing(!pawn.IsWhite)!;
+        if(_manager.isKingInCheck(eKing))
+            _highlighter.highlightCheck(GameBoard, eKing.Row, eKing.Column);
+
         _isPromoting = false;
         _manager.whiteTurn = !_manager.whiteTurn;
 
