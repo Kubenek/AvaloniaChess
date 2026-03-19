@@ -84,8 +84,23 @@ public partial class MainWindow : Window
         _manager.pieces[row, col] = piece;
         _render.updatePieceVisual(GameBoard, pawn, piece);
 
+        if(MoveList.Items.Count > 0 && MoveList.Items[0] is MoveEntry lastMove)
+        {
+            string symbol = type switch
+            {
+                PieceType.Queen  => "Q",
+                PieceType.Rook   => "R",
+                PieceType.Knight => "N",
+                PieceType.Bishop => "B",
+                _                => "Q"
+            };
+
+            MoveEntry newEntry = new(lastMove.move + $"={symbol}", lastMove.player);
+            MoveList.Items[0] = newEntry;
+        }
+
         King eKing = _manager.fetchKing(!pawn.IsWhite)!;
-        if(_manager.isKingInCheck(eKing))
+        if(_manager.isKingInCheck(eKing) && !_highlighter.isHighlighted(eKing.Row, eKing.Column))
             _highlighter.highlightCheck(GameBoard, eKing.Row, eKing.Column);
 
         _isPromoting = false;

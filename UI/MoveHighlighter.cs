@@ -78,6 +78,13 @@ namespace Chess.UI
             checks[row, col] = square;
         }
     
+        public bool isHighlighted(int row, int col)
+        {
+            if(highlightedSquares[row, col] is not null) return true;
+            if(checks[row, col] is not null) return true;
+            return false;
+        }
+
         public void clearCheck(Grid GameBoard)
         {
             foreach(var hl in checks)
