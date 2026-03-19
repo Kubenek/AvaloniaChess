@@ -88,23 +88,7 @@
                 </Grid>
             </Grid>
 
-            <ListBox Name="MoveList" Height="400" Grid.Row="1">
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="local:MoveEntry">
-                        <Grid>
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock Grid.Column="0" Text="{Binding move}"/>
-                            <TextBlock Grid.Column="1" Text="{Binding player}"/>
-
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <comp:MoveListBox Name="MoveList"/>
 
         </Grid>
 

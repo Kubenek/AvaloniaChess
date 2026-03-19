@@ -52,9 +52,7 @@ public partial class MainWindow : Window
         };
 
         MoveEntry entry = new(move, player);
-
-        MoveList.Items.Insert(0, entry);
-        MoveList.SelectedIndex = 0;
+        MoveList.AddMove(entry);
     }
 
     private async void PromotePawn(Pawn pawn)
@@ -84,8 +82,9 @@ public partial class MainWindow : Window
         _manager.pieces[row, col] = piece;
         _render.updatePieceVisual(GameBoard, pawn, piece);
 
-        if(MoveList.Items.Count > 0 && MoveList.Items[0] is MoveEntry lastMove)
+        if(MoveList.getLength() > 0)
         {
+            MoveEntry lastMove = MoveList.getLastMove()!;
             string symbol = type switch
             {
                 PieceType.Queen  => "Q",
@@ -96,7 +95,7 @@ public partial class MainWindow : Window
             };
 
             MoveEntry newEntry = new(lastMove.move + $"={symbol}", lastMove.player);
-            MoveList.Items[0] = newEntry;
+            MoveList.editMove(0, newEntry);
         }
 
         King eKing = _manager.fetchKing(!pawn.IsWhite)!;
