@@ -129,6 +129,9 @@ public partial class MainWindow : Window
         _highlighter.clearHighlights(GameBoard);
         _highlighter.clearCheck(GameBoard);
 
+        if(piece is King k) k.hasMoved = true;
+        if(piece is Rook r) r.hasMoved = true;
+
         var (isCheck, isMate, isStalemate) = EvaluateGame(!piece.IsWhite);
         King king = _manager.fetchKing(!piece.IsWhite)!;
 
@@ -190,6 +193,28 @@ public partial class MainWindow : Window
                 }
                 
             }
+        }
+
+        if(piece is King king && !king.hasMoved)
+        {
+            int row = king.Row;
+            int col = king.Column;
+
+            var c1 = _manager.fetchPieceAt(row, col+1);
+            var c2 = _manager.fetchPieceAt(row, col+2);
+            var c3 = _manager.fetchPieceAt(row, col+3);
+
+            if(c1 is null && c2 is null && c3 is Rook rook && !rook.hasMoved)
+                legalMoves.Add((row, col+2));
+            
+            var cl1 = _manager.fetchPieceAt(row, col-1);
+            var cl2 = _manager.fetchPieceAt(row, col-2);
+            var cl3 = _manager.fetchPieceAt(row, col-3);
+            var cl4 = _manager.fetchPieceAt(row, col-4);
+
+            if(cl1 is null && cl2 is null && cl3 is null && cl4 is Rook r && !r.hasMoved)
+                legalMoves.Add((row, col-2));
+
         }
 
         _highlighter.highlightPieceMoves(piece, GameBoard, pieceVis, legalMoves);

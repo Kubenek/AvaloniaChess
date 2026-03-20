@@ -68,6 +68,28 @@ namespace Chess.GameManager
                 Piece cap = fetchPieceAt(piece.Row, col)!;
                 capturePiece(cap);
                 capture = true;
+            } else if (piece is King king && target is null) {
+                int distance = Math.Abs(piece.Column - col);
+                if(distance >= 2)
+                {
+                    int rookCol = col > piece.Column ? col + 1 : col - 2;  // Kingside: col+1, Queenside: col-2
+                    int newRookCol = col > piece.Column ? col - 1 : col + 1;  // Kingside: col-1, Queenside: col+1
+                    
+                    Piece rook = fetchPieceAt(row, rookCol)!;
+
+                    king.Row    = row;
+                    king.Column = col;
+                    pieces[row, col] = king;
+                    pieces[row, rookCol] = null;
+
+                    rook.Row = row;
+                    rook.Column = newRookCol;
+                    pieces[row, newRookCol] = rook;
+
+                    whiteTurn = !whiteTurn;
+
+                    return false;
+                }
             }
             else if(target is not null)
             {

@@ -75,8 +75,24 @@ namespace Chess.UI
                 Piece capPawn = _manager.fetchPieceAt(piece.Row, col)!;
                 TextBlock vis = _visuals[capPawn];
                 GameBoard.Children.Remove(vis);
+            } else if(piece is King && target is null)
+            {
+                int distance = Math.Abs(piece.Column - col);
+                if(distance >= 2)
+                {
+                    int rookCol = col > piece.Column ? col + 1 : col - 2;  // Kingside: col+1, Queenside: col-2
+                    int newRookCol = col > piece.Column ? col - 1 : col + 1;  // Kingside: col-1, Queenside: col+1
+                    
+                    Piece rook = _manager.fetchPieceAt(row, rookCol)!;
+                    TextBlock rookVis = _visuals[rook];
+                    
+                    GameBoard.Children.Remove(rookVis);
+                    Grid.SetRow(rookVis, row);
+                    Grid.SetColumn(rookVis, newRookCol);
+                    GameBoard.Children.Add(rookVis);
+                }
             }
-
+ 
             Grid.SetRow    (pieceVis, row);
             Grid.SetColumn (pieceVis, col);
 
