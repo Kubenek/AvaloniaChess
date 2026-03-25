@@ -28,7 +28,7 @@ public partial class MainWindow : Window
     private TaskCompletionSource<PieceType>? _promotionChoice;
     private bool _isPromoting = false;
 
-    private void LogMove(Piece piece, int fromCol, int toRow, int toCol, bool capture, bool isCheck, bool isMate)
+    private void LogMove(Piece piece, int fromRow, int fromCol, int toRow, int toCol, bool capture, bool isCheck, bool isMate)
     {
         char column = (char)('a' + toCol);
         char fromColumn = (char)('a' + fromCol);
@@ -38,6 +38,7 @@ public partial class MainWindow : Window
         string player = piece.IsWhite ? "White" : "Black";
 
         int rank = 8 - toRow;
+        int horizontalDist = Math.Abs(fromCol - toCol);
 
         string template = $"{cap}{column}{rank}{ch}";
         string move = piece switch
@@ -47,7 +48,7 @@ public partial class MainWindow : Window
             Rook =>  "R" + template, 
             Queen =>  "Q" + template,
             Knight =>  "N" + template,
-            King =>  "K" + template,
+            King =>  (horizontalDist < 2) ? "K" + template : ((toCol > fromCol) ? "O-O" : "O-O-O"),
             _ => ""
         };
 
@@ -122,7 +123,8 @@ public partial class MainWindow : Window
 
     private void ExecuteMove(Piece piece, TextBlock pieceVis, int row, int col)
     {
-        int ogCol = piece.Column;
+        int fromCol = piece.Column;
+        int fromRow = piece.Row;
 
         _render.movePiece(GameBoard, pieceVis, piece, row, col, _manager); //? Moves piece and captures the piece visually  
         bool cap = _manager.movePiece(piece, row, col);                    //? Moves piece and captures the piece logically
@@ -149,7 +151,7 @@ public partial class MainWindow : Window
         }
 
         Components.updateTurnText(_manager.whiteTurn, TextWhite, TextBlack);
-        LogMove(piece, ogCol, row, col, cap, isCheck, isMate);
+        LogMove(piece, fromRow, fromCol, row, col, cap, isCheck, isMate);
     }
 
     private void PieceClicked(Piece piece, TextBlock pieceVis)
