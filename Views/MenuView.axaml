@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Chess"
+             xmlns:comp="clr-namespace:Chess.Modules"
+             x:Class="Chess.Views.MenuView">
+
+
+    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
+        <TextBlock Text="Avalonia Chess" FontSize="48" HorizontalAlignment="Center"/>
+        
+        <Button Name="btnStart" Content="Start Game" FontSize="24" Padding="40,10"/>
+        <Button Name="btnSettings" Content="Settings" FontSize="24" Padding="40,10"/>
+        <Button Name="btnQuit" Content="Quit" FontSize="24" Padding="40,10"/>
+    </StackPanel>
+
+
+</UserControl>
