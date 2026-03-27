@@ -5,6 +5,18 @@
              xmlns:local="clr-namespace:Chess"
              x:Class="Chess.Modules.MoveListBox">
 
+    <UserControl.Styles>
+        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="#33000000"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected:focus /template/ ContentPresenter">
+            <Setter Property="Background" Value="#33000000"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#44000000"/>
+        </Style>
+    </UserControl.Styles>
+
     <ListBox Name="MoveListBoxControl" Height="400" Grid.Row="1">
         <ListBox.ItemTemplate>
             <DataTemplate DataType="local:MoveEntry">
