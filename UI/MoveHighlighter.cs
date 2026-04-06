@@ -16,6 +16,26 @@ namespace Chess.UI
 
         public event Action<Piece, TextBlock, int, int>? MoveMade;
 
+        public void highlightReviewMove(Grid GameBoard, List<(int, int)> moves)
+        {
+            foreach(var m in moves)
+            {
+                int row = m.Item1; int col = m.Item2;
+
+                var square = new Border
+                {
+                   Background = Brushes.Blue,
+                   Opacity = 0.25
+                };
+
+                Grid.SetRow(square, row);
+                Grid.SetColumn(square, col);
+
+                GameBoard.Children.Add(square);
+                highlightedSquares[row, col] = square;
+            }
+        }
+
         public void highlightPieceMoves(Piece piece, Grid GameBoard, TextBlock pieceVis, List<(int, int)> moves)
         {
             foreach(var move in moves)

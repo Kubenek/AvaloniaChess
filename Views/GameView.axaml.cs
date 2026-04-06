@@ -64,6 +64,9 @@ public partial class GameView : UserControl
             _render.wipeBoard(GameBoard);
             _render.renderPieces(GameBoard, clone);
             _highlighter.clearHighlights(GameBoard);
+
+            List<(int, int)> moves = [entry.fromPos, entry.toPos];
+            _highlighter.highlightReviewMove(GameBoard, moves);
         }  
     }
 
@@ -94,7 +97,10 @@ public partial class GameView : UserControl
         ChessManager clone = _manager.Clone();
         Piece?[,] board = clone.pieces;
 
-        MoveEntry entry = new(move, player, board);
+        var from = (fromRow, fromCol);
+        var to   = (toRow, toCol);
+
+        MoveEntry entry = new(move, player, board, from, to);
         MoveList.AddMove(entry);
     }
 
@@ -137,7 +143,7 @@ public partial class GameView : UserControl
                 _                => "Q"
             };
 
-            MoveEntry newEntry = new(lastMove.move + $"={symbol}", lastMove.player, lastMove.board);
+            MoveEntry newEntry = new(lastMove.move + $"={symbol}", lastMove.player, lastMove.board, lastMove.fromPos, lastMove.toPos);
             MoveList.editMove(0, newEntry);
         }
 

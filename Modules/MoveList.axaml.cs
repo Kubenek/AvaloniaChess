@@ -27,13 +27,6 @@ public partial class MoveListBox : UserControl
             if(_addingMove) return;
             if(MoveListBoxControl.SelectedItem is MoveEntry entry)
                 EntryPressed?.Invoke(entry);
-                // call an action and tell game view that we need to act on this shit
-                // act on this shit:
-                  // save current game state
-                  // fetch game state from MoveList
-                  // switch up the pieces for both the logic and the piece renders
-                  // turn off interaction
-                  // light up the piece that had moved
         };
 
     }
