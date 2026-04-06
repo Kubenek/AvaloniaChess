@@ -1,8 +1,13 @@
 using System.Diagnostics;
+using System;
+using System.Linq;
+
+using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Data;
+using Avalonia.Controls.Shapes;
 using Avalonia.Layout;
 using Avalonia.Media;
+
 using Chess.GameManager;
 
 namespace Chess.UI
@@ -24,7 +29,6 @@ namespace Chess.UI
             CheckmateText.Text = "Game ends in Stalemate!"; 
             CheckmateOverlay.IsVisible = true;
         }
-
         private static TextBlock makeLabel(string text, int ft)
         {
             var label = new TextBlock
@@ -74,6 +78,70 @@ namespace Chess.UI
                 left. Children.Add(lLabel);
                 right.Children.Add(rLabel);
 
+            }
+        }
+    
+        public static void drawArrow((int, int) from, (int, int) to, Color color, Grid board)
+        {
+            int cellSize = 50;
+            double opc = 0.7;
+    
+            double x1 = from.Item2 * cellSize + cellSize / 2.0;
+            double y1 = from.Item1 * cellSize + cellSize / 2.0;
+            double x2 = to.Item2 * cellSize + cellSize / 2.0;
+            double y2 = to.Item1 * cellSize + cellSize / 2.0;
+
+            double angle = Math.Atan2(y2 - y1, x2 - x1);
+            double arrowSize = 15;
+            double shortenLine = 13;
+
+            double x2Short = x2 - shortenLine*Math.Cos(angle);
+            double y2Short = y2 - shortenLine*Math.Sin(angle);
+            
+            var line = new Line
+            {
+                StartPoint = new Point(x1, y1),
+                EndPoint = new Point(x2Short, y2Short),
+                Stroke = new SolidColorBrush(color),
+                StrokeThickness = 6,
+                ZIndex = 100,
+                Opacity = opc
+            };
+            
+            var arrowHead = new Polygon
+            {
+                Fill = new SolidColorBrush(color),
+                Points = new Points
+                {
+                    new Point(x2, y2),
+                    new Point(
+                        x2 - arrowSize * Math.Cos(angle - Math.PI / 6),
+                        y2 - arrowSize * Math.Sin(angle - Math.PI / 6)
+                    ),
+                    new Point(
+                        x2 - arrowSize * Math.Cos(angle + Math.PI / 6),
+                        y2 - arrowSize * Math.Sin(angle + Math.PI / 6)
+                    )
+                },
+                ZIndex = 100,
+                Opacity = opc
+            };
+            
+            board.Children.Add(line);
+            board.Children.Add(arrowHead);
+        }
+    
+        public static void clearArrows(Grid board)
+        {
+            var arrows = board.Children
+                .OfType<Line>()
+                .Cast<Control>()
+                .Concat(board.Children.OfType<Polygon>().Cast<Control>())
+                .ToList();
+            
+            foreach (var arrow in arrows)
+            {
+                board.Children.Remove(arrow);
             }
         }
     }

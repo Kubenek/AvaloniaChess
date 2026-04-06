@@ -8,6 +8,7 @@ using Chess.Modules;
 using Chess.GameManager;
 using Chess.Pieces;
 using Chess.UI;
+using Avalonia.Media;
 
 namespace Chess.Views;
 
@@ -48,25 +49,27 @@ public partial class GameView : UserControl
     {
         var lastMove = MoveList.getLastMove();
 
+        _highlighter.clearHighlights(GameBoard);
+        _render.wipeBoard(GameBoard);
+        Components.clearArrows(GameBoard);
+
         if(entry == lastMove)
         {
             _inReviewMode = false;
-            _render.wipeBoard(GameBoard);
             _render.renderPieces(GameBoard, _manager);
-            _highlighter.clearHighlights(GameBoard);
         } else
         {
             _inReviewMode = true;
         
             ChessManager clone = _manager.Clone();
             clone.pieces = entry.board;
-            
-            _render.wipeBoard(GameBoard);
-            _render.renderPieces(GameBoard, clone);
-            _highlighter.clearHighlights(GameBoard);
 
+            _render.renderPieces(GameBoard, clone);
+            
             List<(int, int)> moves = [entry.fromPos, entry.toPos];
             _highlighter.highlightReviewMove(GameBoard, moves);
+
+            Components.drawArrow(entry.fromPos, entry.toPos, Colors.Yellow, GameBoard);
         }  
     }
 
