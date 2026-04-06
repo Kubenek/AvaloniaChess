@@ -13,13 +13,14 @@ namespace Chess.Views;
 
 public partial class GameView : UserControl
 {
-
     private ChessManager    _manager;
     private MoveHighlighter _highlighter;
     private PieceRender     _render;
 
     private TaskCompletionSource<PieceType>? _promotionChoice;
-    private bool _isPromoting = false;
+
+    private bool _isPromoting  = false;
+    private bool _inReviewMode = false;
 
     public GameView()
     {
@@ -40,6 +41,30 @@ public partial class GameView : UserControl
         _render.renderPieces(GameBoard, _manager);
         _render.PiecePressed += PieceClicked;
 
+        MoveList.EntryPressed += EntryClicked;
+    }
+
+    private void EntryClicked(MoveEntry entry)
+    {
+        var lastMove = MoveList.getLastMove();
+
+        if(entry == lastMove)
+        {
+            _inReviewMode = false;
+            _render.wipeBoard(GameBoard);
+            _render.renderPieces(GameBoard, _manager);
+            _highlighter.clearHighlights(GameBoard);
+        } else
+        {
+            _inReviewMode = true;
+        
+            ChessManager clone = _manager.Clone();
+            clone.pieces = entry.board;
+            
+            _render.wipeBoard(GameBoard);
+            _render.renderPieces(GameBoard, clone);
+            _highlighter.clearHighlights(GameBoard);
+        }  
     }
 
     private void LogMove(Piece piece, int fromRow, int fromCol, int toRow, int toCol, bool capture, bool isCheck, bool isMate)
@@ -66,7 +91,10 @@ public partial class GameView : UserControl
             _ => ""
         };
 
-        MoveEntry entry = new(move, player);
+        ChessManager clone = _manager.Clone();
+        Piece?[,] board = clone.pieces;
+
+        MoveEntry entry = new(move, player, board);
         MoveList.AddMove(entry);
     }
 
@@ -109,7 +137,7 @@ public partial class GameView : UserControl
                 _                => "Q"
             };
 
-            MoveEntry newEntry = new(lastMove.move + $"={symbol}", lastMove.player);
+            MoveEntry newEntry = new(lastMove.move + $"={symbol}", lastMove.player, lastMove.board);
             MoveList.editMove(0, newEntry);
         }
 
@@ -170,7 +198,8 @@ public partial class GameView : UserControl
 
     private void PieceClicked(Piece piece, TextBlock pieceVis)
     {
-        if(_isPromoting) return;
+        if(_isPromoting)  return;
+        if(_inReviewMode) return;
         _highlighter.clearHighlights(GameBoard);
 
         if(piece.IsWhite != _manager.whiteTurn) return;

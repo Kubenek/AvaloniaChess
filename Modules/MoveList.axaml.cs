@@ -15,14 +15,35 @@ namespace Chess.Modules;
 
 public partial class MoveListBox : UserControl
 {
+    private bool _addingMove = false;
+
+    public event Action<MoveEntry>? EntryPressed;
+
     public MoveListBox() {
         InitializeComponent();
+
+        MoveListBoxControl.SelectionChanged += (s, e) =>
+        {
+            if(_addingMove) return;
+            if(MoveListBoxControl.SelectedItem is MoveEntry entry)
+                EntryPressed?.Invoke(entry);
+                // call an action and tell game view that we need to act on this shit
+                // act on this shit:
+                  // save current game state
+                  // fetch game state from MoveList
+                  // switch up the pieces for both the logic and the piece renders
+                  // turn off interaction
+                  // light up the piece that had moved
+        };
+
     }
 
     public void AddMove(MoveEntry entry)
     {
+        _addingMove = true;
         MoveListBoxControl.Items.Insert(0, entry);
         MoveListBoxControl.SelectedIndex = 0;
+        _addingMove = false;
     }
 
     public int getLength()

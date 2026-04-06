@@ -17,7 +17,6 @@ namespace Chess.UI
 
         public void renderPieces(Grid GameBoard, ChessManager manager)
         {
-
             var pieces = manager.pieces;
             
             foreach(var piece in pieces)
@@ -113,6 +112,15 @@ namespace Chess.UI
             Grid.SetRow   (pieceVisual, row);
             Grid.SetColumn(pieceVisual, col);
             GameBoard.Children.Add(pieceVisual);
+        }
+
+        public void wipeBoard(Grid GameBoard)
+        {
+            foreach(var vis in _visuals)
+            {
+                GameBoard.Children.Remove(vis.Value);
+            }
+            _visuals.Clear();
         }
 
     }
