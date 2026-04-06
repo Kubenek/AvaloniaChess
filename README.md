@@ -8,6 +8,7 @@ A Chess application built in C# and Avalonia (Version 11.3.12)
 - Pawn promotion
 - En passant capture
 - Move history with algebraic notation
+- Review mode for moves
 
 ## Installation & Running
     
@@ -26,10 +27,8 @@ cd AvaloniaChess
 dotnet run
 ```
 
-The game window will open automatically.
+The game window will open automatically
 
 ## Roadmap
-- [ ] Castling
-- [ ] Move analysis
 - [ ] Menu systems
 - [ ] Enemy bots
