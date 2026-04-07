@@ -10,6 +10,7 @@ using Chess.Pieces;
 using Chess.UI;
 using Avalonia.Media;
 using System.Linq;
+using Chess.Factories;
 
 namespace Chess.Views;
 
@@ -134,21 +135,8 @@ public partial class GameView : UserControl
         _promotionChoice = new TaskCompletionSource<PieceType>();
         PieceType type = await _promotionChoice.Task;
 
-        bool isWhite = pawn.IsWhite;
-
-        Piece piece = type switch 
-        {
-            PieceType.Queen  => new   Queen(isWhite),
-            PieceType.Rook   => new    Rook(isWhite),
-            PieceType.Knight => new  Knight(isWhite),
-            PieceType.Bishop => new  Bishop(isWhite),
-            _                => new   Queen(isWhite)
-        };
-
-        int row = pawn.Row; int col = pawn.Column;
-        _manager.pieces[row, col] = null;
-
-        piece.Row = row; piece.Column = col;
+        var (row, col, isWhite) = (pawn.Row, pawn.Column, pawn.IsWhite);
+        Piece piece = PieceFactory.createPiece(type, isWhite, row, col); 
 
         _manager.pieces[row, col] = piece;
         _render.updatePieceVisual(GameBoard, pawn, piece);

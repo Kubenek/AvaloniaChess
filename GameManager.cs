@@ -1,8 +1,8 @@
-using Avalonia.Controls;
 using System;
-using Chess.Pieces;
-using System.Collections.Generic;
 using System.Linq;
+
+using Chess.Pieces;
+using Chess.Factories;
 
 namespace Chess.GameManager
 {
@@ -29,23 +29,23 @@ namespace Chess.GameManager
             int pawnRow = isWhite ? 6 : 1;
 
             for(int col=0; col < 8; col++)  //* Initialize Pawn Row
-                createPiece(new Pawn(isWhite), pawnRow, col);
+                createPiece(PieceType.Pawn, isWhite, pawnRow, col);
 
             int backRow = isWhite ? 7 : 0;
 
-            createPiece(new Rook   (isWhite), backRow, 0);
-            createPiece(new Knight (isWhite), backRow, 1);
-            createPiece(new Bishop (isWhite), backRow, 2);
-            createPiece(new Queen  (isWhite), backRow, 3);
-            createPiece(new King   (isWhite), backRow, 4);
-            createPiece(new Bishop (isWhite), backRow, 5);
-            createPiece(new Knight (isWhite), backRow, 6);
-            createPiece(new Rook   (isWhite), backRow, 7);
+            createPiece(PieceType.Rook,   isWhite, backRow, 0);
+            createPiece(PieceType.Knight, isWhite, backRow, 1);
+            createPiece(PieceType.Bishop, isWhite, backRow, 2);
+            createPiece(PieceType.Queen,  isWhite, backRow, 3);
+            createPiece(PieceType.King,   isWhite, backRow, 4);
+            createPiece(PieceType.Bishop, isWhite, backRow, 5);
+            createPiece(PieceType.Knight, isWhite, backRow, 6);
+            createPiece(PieceType.Rook,   isWhite, backRow, 7);
         }
 
-        public void createPiece(Piece piece, int row, int col)
+        public void createPiece(PieceType type, bool isWhite, int row, int col)
         {
-            piece.Row = row; piece.Column = col;
+            Piece piece = PieceFactory.createPiece(type, isWhite, row, col);
             pieces[row, col] = piece;
         }
 
