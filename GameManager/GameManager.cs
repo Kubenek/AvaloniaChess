@@ -12,6 +12,7 @@ namespace Chess.GameManager
         public Piece? [,] pieces = new Piece[8,8];
         public Piece? lastMovedPiece = null;
         public bool whiteTurn = true;
+        public GameState state;
 
         public event Action<Pawn>? Promotion;
 
