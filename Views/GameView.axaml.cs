@@ -177,7 +177,7 @@ public partial class GameView : UserControl
         int fromRow = piece.Row;
 
         _render.movePiece(GameBoard, pieceVis, piece, row, col, _manager); //? Moves piece and captures the piece visually  
-        bool cap = _engine.movePiece(piece, row, col, _manager);                    //? Moves piece and captures the piece logically
+        bool cap = _engine.movePiece(piece, row, col, _manager, false);                    //? Moves piece and captures the piece logically
         _highlighter.clearHighlights(GameBoard);
         _highlighter.clearCheck(GameBoard);
 

@@ -9,7 +9,7 @@ public class MoveEngine
 {
     public event Action<Pawn>? Promotion;
     
-    public bool movePiece(Piece piece, int row, int col, ChessManager _manager)
+    public bool movePiece(Piece piece, int row, int col, ChessManager _manager, bool simulation)
     {
         bool capture = false;
 
@@ -54,21 +54,22 @@ public class MoveEngine
         }
         else if(target is not null)
         {
-            capturePiece(target, _manager); capture = true;
+            capturePiece(target, _manager); 
+            capture = true;
         }
 
         piece.Row    = row;
         piece.Column = col;
         _manager._state.Board[row, col] = piece;
 
-        if(piece is Pawn p && (row == 0 || row == 7))
+        if(piece is Pawn p && (row == 0 || row == 7) && !simulation)
         {
             Promotion?.Invoke(p);
             return capture;
         }
 
-        _manager._state.IsWhiteTurn = !_manager._state.IsWhiteTurn;
-
+        if(!simulation)
+            _manager._state.IsWhiteTurn = !_manager._state.IsWhiteTurn;
 
         return capture;
     }
@@ -85,7 +86,7 @@ public class MoveEngine
         Piece? piece = simulation._state.Board[fromRow, fromCol];
         if(piece is null) return false;
 
-        movePiece(piece, toRow, toCol, simulation);
+        movePiece(piece, toRow, toCol, simulation, true);
 
         King king = simulation.fetchKing(piece.IsWhite)!;
         
