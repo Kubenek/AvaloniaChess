@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Remote.Protocol.Input;
-using Chess.GameManager;
+using Chess.Logic;
 
 namespace Chess.Pieces
 {

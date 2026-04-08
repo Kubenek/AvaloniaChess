@@ -4,8 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using Chess.Modules;
-using Chess.GameManager;
+using Chess.Logic;
 using Chess.Pieces;
 using Chess.UI;
 using Avalonia.Media;
@@ -17,6 +16,8 @@ namespace Chess.Views;
 public partial class GameView : UserControl
 {
     private ChessManager    _manager;
+    private MoveEngine      _engine;
+
     private MoveHighlighter _highlighter;
     private PieceRender     _render;
 
@@ -33,10 +34,12 @@ public partial class GameView : UserControl
         BoardRender.renderBoard(GameBoard);
         Components.CreateLabels(TopLabels, LeftLabels, BottomLabels, RightLabels);
 
-        _manager = new ChessManager();
+        _manager = new ChessManager(new GameState());
         _manager.initializePieces();
-        _manager.state = GameState.Playing;
-        _manager.Promotion += PromotePawn;
+        _manager._state.CurrentState = GameStateType.Playing;
+
+        _engine = new MoveEngine();
+        _engine.Promotion += PromotePawn;
 
         _highlighter = new MoveHighlighter();
         _highlighter.MoveMade += ExecuteMove;
@@ -57,10 +60,10 @@ public partial class GameView : UserControl
         _render.wipeBoard(GameBoard);
         Components.clearArrows(GameBoard);
 
-        if(_manager.state is GameState.Checkmate or GameState.Stalemate) CheckmateOverlay.Show();
+        if(_manager._state.CurrentState is GameStateType.Checkmate or GameStateType.Stalemate) CheckmateOverlay.Show();
 
         _render.renderPieces(GameBoard, _manager);
-        Components.updateTurnText(_manager.whiteTurn, TextWhite, TextBlack);
+        Components.updateTurnText(_manager._state.IsWhiteTurn, TextWhite, TextBlack);
     }
 
     private void EntryClicked(MoveEntry entry)
@@ -74,7 +77,7 @@ public partial class GameView : UserControl
         Components.clearArrows(GameBoard);
     
         ChessManager clone = _manager.Clone();
-        clone.pieces = entry.board;
+        clone._state.Board = entry.board;
 
         _render.renderPieces(GameBoard, clone);
         
@@ -93,12 +96,12 @@ public partial class GameView : UserControl
         
     }
 
-    private void LogMove(Piece piece, int fromRow, int fromCol, int toRow, int toCol, bool capture, bool isCheck, bool isMate)
+    private void LogMove(Piece piece, int fromRow, int fromCol, int toRow, int toCol, bool capture, GameStateType state)
     {
         char column = (char)('a' + toCol);
         char fromColumn = (char)('a' + fromCol);
 
-        string ch = isMate ? "#" : (isCheck ? "+" : "");
+        string ch = (state is GameStateType.Checkmate) ? "#" : (state is GameStateType.Check ? "+" : "");
         string cap = capture ? "x" : "";
         string player = piece.IsWhite ? "White" : "Black";
 
@@ -118,7 +121,7 @@ public partial class GameView : UserControl
         };
 
         ChessManager clone = _manager.Clone();
-        Piece?[,] board = clone.pieces;
+        Piece?[,] board = clone._state.Board;
 
         var from = (fromRow, fromCol);
         var to   = (toRow, toCol);
@@ -138,7 +141,7 @@ public partial class GameView : UserControl
         var (row, col, isWhite) = (pawn.Row, pawn.Column, pawn.IsWhite);
         Piece piece = PieceFactory.createPiece(type, isWhite, row, col); 
 
-        _manager.pieces[row, col] = piece;
+        _manager._state.Board[row, col] = piece;
         _render.updatePieceVisual(GameBoard, pawn, piece);
 
         if(MoveList.getLength() > 0)
@@ -158,25 +161,14 @@ public partial class GameView : UserControl
         }
 
         King eKing = _manager.fetchKing(!pawn.IsWhite)!;
-        if(_manager.isKingInCheck(eKing) && !_highlighter.isHighlighted(eKing.Row, eKing.Column))
+        if(Evaluator.isKingInCheck(eKing, _manager) && !_highlighter.isHighlighted(eKing.Row, eKing.Column))
             _highlighter.highlightCheck(GameBoard, eKing.Row, eKing.Column);
 
         _isPromoting = false;
-        _manager.whiteTurn = !_manager.whiteTurn;
+        _manager._state.IsWhiteTurn = !_manager._state.IsWhiteTurn;
 
         PromotionDialog.Hide();
-        Components.updateTurnText(_manager.whiteTurn, TextWhite, TextBlack);
-    }
-
-    private (bool isCheck, bool isMate, bool isStalemate) EvaluateGame(bool isWhite)
-    {
-        King king = _manager.fetchKing(isWhite)
-        !;
-        bool check     =           _manager.isKingInCheck(king);
-        bool mate      =  check && _manager.isCheckmate(isWhite);
-        bool stalemate = !check && _manager.isStalemate(isWhite);
-
-        return (check, mate, stalemate);
+        Components.updateTurnText(_manager._state.IsWhiteTurn, TextWhite, TextBlack);
     }
 
     private void ExecuteMove(Piece piece, TextBlock pieceVis, int row, int col)
@@ -185,36 +177,33 @@ public partial class GameView : UserControl
         int fromRow = piece.Row;
 
         _render.movePiece(GameBoard, pieceVis, piece, row, col, _manager); //? Moves piece and captures the piece visually  
-        bool cap = _manager.movePiece(piece, row, col);                    //? Moves piece and captures the piece logically
+        bool cap = _engine.movePiece(piece, row, col, _manager);                    //? Moves piece and captures the piece logically
         _highlighter.clearHighlights(GameBoard);
         _highlighter.clearCheck(GameBoard);
-
-        _manager.state = GameState.Playing;
 
         if(piece is King k) k.hasMoved = true;
         if(piece is Rook r) r.hasMoved = true;
 
-        var (isCheck, isMate, isStalemate) = EvaluateGame(!piece.IsWhite);
+        GameStateType state = Evaluator.EvaluateGame(!piece.IsWhite, _engine, _manager);
+        _manager._state.CurrentState = state;
+
         King king = _manager.fetchKing(!piece.IsWhite)!;
 
 
-        if(isCheck) 
+        if(state is GameStateType.Check) 
             _highlighter.highlightCheck(GameBoard, king.Row, king.Column);
-            _manager.state = GameState.Check;
-        if(isMate) {
-            _manager.state = GameState.Checkmate;
+        if(state is GameStateType.Checkmate) {
             string player = piece.IsWhite ? "White" : "Black";
             CheckmateOverlay.setText($"{player} wins by Checkmate!");
             CheckmateOverlay.Show();
         }
-        else if(isStalemate) {
-            _manager.state = GameState.Stalemate;
+        else if(state is GameStateType.Stalemate) {
             CheckmateOverlay.setText("Game ends in Stalemate!");
             CheckmateOverlay.Show();
         }
 
-        Components.updateTurnText(_manager.whiteTurn, TextWhite, TextBlack);
-        LogMove(piece, fromRow, fromCol, row, col, cap, isCheck, isMate);
+        Components.updateTurnText(_manager._state.IsWhiteTurn, TextWhite, TextBlack);
+        LogMove(piece, fromRow, fromCol, row, col, cap, state);
     }
 
     private void PieceClicked(Piece piece, TextBlock pieceVis)
@@ -223,7 +212,7 @@ public partial class GameView : UserControl
         if(_inReviewMode) return;
         _highlighter.clearHighlights(GameBoard);
 
-        if(piece.IsWhite != _manager.whiteTurn) return;
+        if(piece.IsWhite != _manager._state.IsWhiteTurn) return;
 
         var moves = piece.availableMoves(_manager);
 
@@ -232,7 +221,7 @@ public partial class GameView : UserControl
 
         foreach(var move in moves)
         {
-            if(!_manager.isMoveLegal(piece.Row, piece.Column, move.Item1, move.Item2)) continue;
+            if(!_engine.isMoveLegal(piece.Row, piece.Column, move.Item1, move.Item2, _manager)) continue;
 
             legalMoves.Add(move);
             var target = _manager.fetchPieceAt(move.Item1, move.Item2);
@@ -254,7 +243,7 @@ public partial class GameView : UserControl
                     int r = pawn.IsWhite ? pawn.Row - 1 : pawn.Row + 1;
                     int c = column;
 
-                    if(!_manager.isMoveLegal(row, pawn.Column, r, c)) continue;       
+                    if(!_engine.isMoveLegal(row, pawn.Column, r, c, _manager)) continue;       
                     legalMoves.Add((r, c)); captures.Add((r, c));
                 }
                 

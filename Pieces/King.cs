@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Security.Cryptography;
 using Avalonia.Diagnostics.Screenshots;
-using Chess.GameManager;
+using Chess.Logic;
 using SkiaSharp;
 
 namespace Chess.Pieces
@@ -40,7 +40,7 @@ namespace Chess.Pieces
 
                 if(currentRow < 0 || currentCol < 0 || currentRow >= 8 || currentCol >= 8) continue;
 
-                var pieces = manager.pieces;
+                var pieces = manager._state.Board;
 
                 var targetSquare = pieces[currentRow, currentCol];
 

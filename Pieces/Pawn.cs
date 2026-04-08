@@ -1,6 +1,6 @@
 
 using System.Collections.Generic;
-using Chess.GameManager;
+using Chess.Logic;
 using SkiaSharp;
 
 namespace Chess.Pieces
@@ -26,7 +26,7 @@ namespace Chess.Pieces
 
             var currentCol = Column;
 
-            var pieces = manager.pieces;
+            var pieces = manager._state.Board;
 
             var targetSquare = pieces[currentRow, currentCol];
             if(targetSquare == null) {

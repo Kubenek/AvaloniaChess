@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using Avalonia.Diagnostics.Screenshots;
-using Chess.GameManager;
+using Chess.Logic;
 using SkiaSharp;
 
 namespace Chess.Pieces
@@ -30,7 +30,7 @@ namespace Chess.Pieces
                 (1, 1)     // down-right
             };
 
-            var pieces = manager.pieces;
+            var pieces = manager._state.Board;
 
             foreach(var (rowDir, colDir) in directions)
             {

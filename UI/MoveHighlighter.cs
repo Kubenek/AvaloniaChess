@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.ExceptionServices;
+
 using Avalonia.Controls;
-using Avalonia.Data;
 using Avalonia.Media;
-using Chess.GameManager;
+
 using Chess.Pieces;
 
 namespace Chess.UI

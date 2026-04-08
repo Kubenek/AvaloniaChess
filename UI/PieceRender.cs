@@ -4,7 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Media;
 using Avalonia.Metadata;
-using Chess.GameManager;
+using Chess.Logic;
 using Chess.Pieces;
 
 namespace Chess.UI
@@ -17,7 +17,7 @@ namespace Chess.UI
 
         public void renderPieces(Grid GameBoard, ChessManager manager)
         {
-            var pieces = manager.pieces;
+            var pieces = manager._state.Board;
             
             foreach(var piece in pieces)
             {
