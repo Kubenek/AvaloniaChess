@@ -19,13 +19,7 @@ namespace Chess.Pieces
         {
             var moves = new List<Position>();
 
-            (int, int)[] directions = new (int, int)[]
-            {
-                (-1, -1),  // up-left
-                (-1, 1),   // up-right
-                (1, -1),   // down-left
-                (1, 1)     // down-right
-            };
+            (int, int)[] directions = Directions.Diagonals;
 
             foreach(var (rowDir, colDir) in directions)
             {
