@@ -2,11 +2,12 @@
 A Chess application built in C# and Avalonia (Version 11.3.12)
 
 ## Features
-- Full chess rules implementation
-- Move validation and legal move highlighting
-- Check and checkmate detection
-- Pawn promotion
-- En passant capture
+- Full chess rules implementation:
+    - Move validation and highlighting
+    - Check and checkmate detection
+    - Pawn promotion
+    - En passant capture
+    - Bothside castling
 - Move history with algebraic notation
 - Review mode for moves
 
@@ -29,6 +30,7 @@ dotnet run
 
 The game window will open automatically
 
-## Roadmap
-- [ ] Menu systems
-- [ ] Enemy bots
+## Feature Ideas
+- [ ] Enemy Bots
+- [ ] Resign function
+- [ ] Move evaluation for Review mode
