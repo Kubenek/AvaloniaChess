@@ -81,32 +81,31 @@ public partial class GameView : UserControl
 
         _render.renderPieces(GameBoard, clone);
         
-        List<(int, int)> moves = [entry.fromPos, entry.toPos];
         if((entry.move.Last() == '+' || entry.move.Last() == '#') ? true : false)
         {
             bool pWhite = (entry.player == "White") ? true : false;
             King king = clone.fetchKing(!pWhite)!;
-            _highlighter.highlightCheck(GameBoard, king.Row, king.Column);
+            _highlighter.highlightCheck(GameBoard, king.Coords);
         }
 
-        _highlighter.highlightReviewMove(GameBoard, moves);
+        _highlighter.highlightReviewMove(GameBoard, entry.Move);
 
-        Components.drawArrow(entry.fromPos, entry.toPos, Colors.Yellow, GameBoard);
+        Components.drawArrow(entry.Move, Colors.Yellow, GameBoard);
         Components.updateReviewModeText(TextWhite, TextBlack);
         
     }
 
-    private void LogMove(Piece piece, int fromRow, int fromCol, int toRow, int toCol, bool capture, GameStateType state)
+    private void LogMove(Piece piece, Move _move, bool capture, GameStateType state)
     {
-        char column = (char)('a' + toCol);
-        char fromColumn = (char)('a' + fromCol);
+        char column = (char)('a' + _move.To.Col);
+        char fromColumn = (char)('a' + _move.From.Col);
 
         string ch = (state is GameStateType.Checkmate) ? "#" : (state is GameStateType.Check ? "+" : "");
         string cap = capture ? "x" : "";
         string player = piece.IsWhite ? "White" : "Black";
 
-        int rank = 8 - toRow;
-        int horizontalDist = Math.Abs(fromCol - toCol);
+        int rank = 8 - _move.To.Row;
+        int horizontalDist = Math.Abs(_move.From.Col - _move.To.Col);
 
         string template = $"{cap}{column}{rank}{ch}";
         string move = piece switch
@@ -116,17 +115,14 @@ public partial class GameView : UserControl
             Rook =>  "R" + template, 
             Queen =>  "Q" + template,
             Knight =>  "N" + template,
-            King =>  (horizontalDist < 2) ? "K" + template : ((toCol > fromCol) ? "O-O" : "O-O-O"),
+            King =>  (horizontalDist < 2) ? "K" + template : ((_move.To.Col > _move.From.Col) ? "O-O" : "O-O-O"),
             _ => ""
         };
 
         ChessManager clone = _manager.Clone();
         Piece?[,] board = clone._state.Board;
 
-        var from = (fromRow, fromCol);
-        var to   = (toRow, toCol);
-
-        MoveEntry entry = new(move, player, board, from, to);
+        MoveEntry entry = new(move, player, board, _move);
         MoveList.AddMove(entry);
     }
 
@@ -138,10 +134,10 @@ public partial class GameView : UserControl
         _promotionChoice = new TaskCompletionSource<PieceType>();
         PieceType type = await _promotionChoice.Task;
 
-        var (row, col, isWhite) = (pawn.Row, pawn.Column, pawn.IsWhite);
-        Piece piece = PieceFactory.createPiece(type, isWhite, row, col); 
+        var (coords, isWhite) = (pawn.Coords, pawn.IsWhite);
+        Piece piece = PieceFactory.createPiece(type, isWhite, coords); 
 
-        _manager._state.Board[row, col] = piece;
+        _manager._state.Board[coords.Row, coords.Col] = piece;
         _render.updatePieceVisual(GameBoard, pawn, piece);
 
         if(MoveList.getLength() > 0)
@@ -156,13 +152,13 @@ public partial class GameView : UserControl
                 _                => "Q"
             };
 
-            MoveEntry newEntry = new(lastMove.move + $"={symbol}", lastMove.player, lastMove.board, lastMove.fromPos, lastMove.toPos);
+            MoveEntry newEntry = new(lastMove.move + $"={symbol}", lastMove.player, lastMove.board, lastMove.Move);
             MoveList.editMove(0, newEntry);
         }
 
         King eKing = _manager.fetchKing(!pawn.IsWhite)!;
-        if(Evaluator.isKingInCheck(eKing, _manager) && !_highlighter.isHighlighted(eKing.Row, eKing.Column))
-            _highlighter.highlightCheck(GameBoard, eKing.Row, eKing.Column);
+        if(Evaluator.isKingInCheck(eKing, _manager) && !_highlighter.isHighlighted(eKing.Coords))
+            _highlighter.highlightCheck(GameBoard, eKing.Coords);
 
         _isPromoting = false;
         _manager._state.IsWhiteTurn = !_manager._state.IsWhiteTurn;
@@ -171,13 +167,10 @@ public partial class GameView : UserControl
         Components.updateTurnText(_manager._state.IsWhiteTurn, TextWhite, TextBlack);
     }
 
-    private void ExecuteMove(Piece piece, TextBlock pieceVis, int row, int col)
+    private void ExecuteMove(Piece piece, TextBlock pieceVis, Move move)
     {
-        int fromCol = piece.Column;
-        int fromRow = piece.Row;
-
-        _render.movePiece(GameBoard, pieceVis, piece, row, col, _manager); //? Moves piece and captures the piece visually  
-        bool cap = _engine.movePiece(piece, row, col, _manager, false);                    //? Moves piece and captures the piece logically
+        _render.movePiece(GameBoard, pieceVis, piece, move.To, _manager); //? Moves piece and captures the piece visually  
+        bool cap = _engine.movePiece(piece, move.To, _manager, false);    //? Moves piece and captures the piece logically
         _highlighter.clearHighlights(GameBoard);
         _highlighter.clearCheck(GameBoard);
 
@@ -191,7 +184,7 @@ public partial class GameView : UserControl
 
 
         if(state is GameStateType.Check) 
-            _highlighter.highlightCheck(GameBoard, king.Row, king.Column);
+            _highlighter.highlightCheck(GameBoard, king.Coords);
         if(state is GameStateType.Checkmate) {
             string player = piece.IsWhite ? "White" : "Black";
             CheckmateOverlay.setText($"{player} wins by Checkmate!");
@@ -203,7 +196,7 @@ public partial class GameView : UserControl
         }
 
         Components.updateTurnText(_manager._state.IsWhiteTurn, TextWhite, TextBlack);
-        LogMove(piece, fromRow, fromCol, row, col, cap, state);
+        LogMove(piece, move, cap, state);
     }
 
     private void PieceClicked(Piece piece, TextBlock pieceVis)
@@ -216,35 +209,40 @@ public partial class GameView : UserControl
 
         var moves = piece.availableMoves(_manager);
 
-        List<(int, int)> legalMoves = [];
-        List<(int, int)> captures   = [];
+        List<Position> legalMoves = [];
+        List<Position> captures   = [];
 
-        foreach(var move in moves)
+        foreach(var position in moves)
         {
-            if(!_engine.isMoveLegal(piece.Row, piece.Column, move.Item1, move.Item2, _manager)) continue;
+            Move move = new(piece.Coords, position);
+            if(!_engine.isMoveLegal(move, _manager)) continue;
 
-            legalMoves.Add(move);
-            var target = _manager.fetchPieceAt(move.Item1, move.Item2);
-            if(target != null && target.IsWhite != piece.IsWhite) captures.Add(move);
+            legalMoves.Add(move.To);
+            var target = _manager.fetchPieceAt(move.To);
+            if(target != null && target.IsWhite != piece.IsWhite) captures.Add(move.To);
         }
 
         if(piece is Pawn pawn)
         {
             for(int i=0; i<2; i++)
             {
-                int column = (i==0) ? pawn.Column - 1 : pawn.Column + 1;
-                int row = pawn.Row;
+                int column = (i==0) ? pawn.Coords.Col - 1 : pawn.Coords.Row + 1;
+                int row = pawn.Coords.Row;
 
                 if(column < 0 || column >= 8) continue;
                 
-                var target = _manager.fetchPieceAt(row, column);
+                var target = _manager.fetchPieceAt(new Position(row, column));
+
                 if(target != null && target.IsWhite != piece.IsWhite && target is Pawn epawn && epawn.lastMoveDouble)
                 {
-                    int r = pawn.IsWhite ? pawn.Row - 1 : pawn.Row + 1;
+                    int r = pawn.IsWhite ? pawn.Coords.Row - 1 : pawn.Coords.Row + 1;
                     int c = column;
+                    Position posFrom = new(row, pawn.Coords.Col);
+                    Position posTo = new(r, c);
+                    Move mv = new(posFrom, posTo);
 
-                    if(!_engine.isMoveLegal(row, pawn.Column, r, c, _manager)) continue;       
-                    legalMoves.Add((r, c)); captures.Add((r, c));
+                    if(!_engine.isMoveLegal(mv, _manager)) continue;       
+                    legalMoves.Add(posTo); captures.Add(posTo);
                 }
                 
             }
@@ -252,23 +250,23 @@ public partial class GameView : UserControl
 
         if(piece is King king && !king.hasMoved)
         {
-            int row = king.Row;
-            int col = king.Column;
+            int row = king.Coords.Row;
+            int col = king.Coords.Col;
 
-            var c1 = _manager.fetchPieceAt(row, col+1);
-            var c2 = _manager.fetchPieceAt(row, col+2);
-            var c3 = _manager.fetchPieceAt(row, col+3);
+            var c1 = _manager.fetchPieceAt(new Position(row, col+1));
+            var c2 = _manager.fetchPieceAt(new Position(row, col+2));
+            var c3 = _manager.fetchPieceAt(new Position(row, col+3));
 
-            if(c1 is null && c2 is null && c3 is Rook rook && !rook.hasMoved)
-                legalMoves.Add((row, col+2));
+            if(c1 is null && c2 is null && c3 is Rook rook && !rook.hasMoved) 
+                legalMoves.Add(new Position(row, col+2));
             
-            var cl1 = _manager.fetchPieceAt(row, col-1);
-            var cl2 = _manager.fetchPieceAt(row, col-2);
-            var cl3 = _manager.fetchPieceAt(row, col-3);
-            var cl4 = _manager.fetchPieceAt(row, col-4);
+            var cl1 = _manager.fetchPieceAt(new Position(row, col-1));
+            var cl2 = _manager.fetchPieceAt(new Position(row, col-2));
+            var cl3 = _manager.fetchPieceAt(new Position(row, col-3));
+            var cl4 = _manager.fetchPieceAt(new Position(row, col-4));
 
-            if(cl1 is null && cl2 is null && cl3 is null && cl4 is Rook r && !r.hasMoved)
-                legalMoves.Add((row, col-2));
+            if(cl1 is null && cl2 is null && cl3 is null && cl4 is Rook r && !r.hasMoved) 
+                legalMoves.Add(new Position(row, col-2));
 
         }
 

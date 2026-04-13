@@ -7,7 +7,7 @@ namespace Chess.Pieces
 {
     public class Pawn : Piece
     {
-        public Pawn(bool isWhite) : base(isWhite)
+        public Pawn(bool isWhite, Position coords) : base(isWhite, coords)
         {
             Texture = "♟";
         }
@@ -15,37 +15,38 @@ namespace Chess.Pieces
         public bool doubleMove = true;
         public bool lastMoveDouble = false;
 
-        public override List<(int, int)> availableMoves(ChessManager manager) 
+        public override List<Position> availableMoves(ChessManager manager) 
         {
-            var moves = new List<(int, int)>();
+            var moves = new List<Position>();
 
             int direction = IsWhite ? -1 : 1;
 
-            var currentRow = Row + direction;
+            var currentRow = Coords.Row + direction;
             if(currentRow < 0 || currentRow >= 8) return moves;
+            var currentCol = Coords.Col;
 
-            var currentCol = Column;
+            Position pos = new(currentRow, currentCol);
+            var targetSquare = manager.fetchPieceAt(pos);
 
-            var pieces = manager._state.Board;
-
-            var targetSquare = pieces[currentRow, currentCol];
             if(targetSquare == null) {
-
-                moves.Add((currentRow, currentCol));
+                moves.Add(pos);
 
                 if(doubleMove)
                 {
-                    targetSquare = pieces[currentRow + direction, currentCol];
-                    if(targetSquare == null) moves.Add((currentRow + direction, currentCol));
+                    pos = new (currentRow + direction, currentCol);
+                    targetSquare = manager.fetchPieceAt(pos);
+                    if(targetSquare == null) moves.Add(pos);
                 }
             }
             if(currentCol-1 >= 0 && currentCol-1 < 8) {
-                var t1 = pieces[currentRow, currentCol-1];
-                if(t1 != null && t1.IsWhite != IsWhite) moves.Add((currentRow, currentCol-1));
+                pos = new (currentRow, currentCol-1);
+                var t1 = manager.fetchPieceAt(pos);
+                if(t1 != null && t1.IsWhite != IsWhite) moves.Add(pos);
             }
             if(currentCol+1 >= 0 && currentCol+1 < 8) {
-                var t2 = pieces[currentRow, currentCol+1];
-                if(t2 != null && t2.IsWhite != IsWhite) moves.Add((currentRow, currentCol+1));
+                pos = new (currentRow, currentCol+1);
+                var t2 = manager.fetchPieceAt(pos);
+                if(t2 != null && t2.IsWhite != IsWhite) moves.Add(pos);
             }
 
             return moves;
@@ -53,12 +54,9 @@ namespace Chess.Pieces
 
         public override Piece Clone()
         {
-            Pawn pawn = new(IsWhite);
-            pawn.Row = Row;
-            pawn.Column = Column;
+            Pawn pawn = new(IsWhite, Coords);
             pawn.doubleMove = doubleMove;
             pawn.lastMoveDouble = lastMoveDouble;
-
             return pawn;
         }
 

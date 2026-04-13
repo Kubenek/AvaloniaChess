@@ -21,9 +21,6 @@ public static class Evaluator
 
     public static bool isKingInCheck(King king, ChessManager _manager)
     {
-        int row =    king.Row;
-        int col = king.Column;
-
         for(int i=0; i<8; i++)
         {
             for(int j=0; j<8; j++) {
@@ -34,7 +31,7 @@ public static class Evaluator
                 var moves = piece.availableMoves(_manager);
                 foreach(var move in moves)
                 {
-                    if(row == move.Item1 && col == move.Item2) return true;
+                    if(king.Coords == move) return true;
                 }
             }
         }
@@ -50,8 +47,8 @@ public static class Evaluator
         var pcs = _manager._state.Board.OfType<Piece>().Where(p => p.IsWhite == isWhite);
         
         var hasLegalMove = pcs.Any(piece => 
-            piece.availableMoves(_manager).Any(move => 
-                _engine.isMoveLegal(piece.Row, piece.Column, move.Item1, move.Item2, _manager)
+            piece.availableMoves(_manager).Any(position => 
+                _engine.isMoveLegal(new Move(piece.Coords, position), _manager)
             )
         );
 
@@ -66,8 +63,8 @@ public static class Evaluator
         var pcs = _manager._state.Board.OfType<Piece>().Where(piece => piece.IsWhite == isWhite);
 
         var hasLegalMove = pcs.Any(piece => 
-            piece.availableMoves(_manager).Any(move => 
-                _engine.isMoveLegal(piece.Row, piece.Column, move.Item1, move.Item2, _manager)
+            piece.availableMoves(_manager).Any(position => 
+                _engine.isMoveLegal(new Move(piece.Coords, position), _manager)
             )
         );
 

@@ -28,29 +28,29 @@ namespace Chess.Logic
             int pawnRow = isWhite ? 6 : 1;
 
             for(int col=0; col < 8; col++)  //* Initialize Pawn Row
-                createPiece(PieceType.Pawn, isWhite, pawnRow, col);
+                createPiece(PieceType.Pawn, isWhite, new Position(pawnRow, col));
 
             int backRow = isWhite ? 7 : 0;
 
-            createPiece(PieceType.Rook,   isWhite, backRow, 0);
-            createPiece(PieceType.Knight, isWhite, backRow, 1);
-            createPiece(PieceType.Bishop, isWhite, backRow, 2);
-            createPiece(PieceType.Queen,  isWhite, backRow, 3);
-            createPiece(PieceType.King,   isWhite, backRow, 4);
-            createPiece(PieceType.Bishop, isWhite, backRow, 5);
-            createPiece(PieceType.Knight, isWhite, backRow, 6);
-            createPiece(PieceType.Rook,   isWhite, backRow, 7);
+            createPiece(PieceType.Rook,   isWhite, new Position(backRow, 0));
+            createPiece(PieceType.Knight, isWhite, new Position(backRow, 1));
+            createPiece(PieceType.Bishop, isWhite, new Position(backRow, 2));
+            createPiece(PieceType.Queen,  isWhite, new Position(backRow, 3));
+            createPiece(PieceType.King,   isWhite, new Position(backRow, 4));
+            createPiece(PieceType.Bishop, isWhite, new Position(backRow, 5));
+            createPiece(PieceType.Knight, isWhite, new Position(backRow, 6));
+            createPiece(PieceType.Rook,   isWhite, new Position(backRow, 7));
         }
 
-        public void createPiece(PieceType type, bool isWhite, int row, int col)
+        public void createPiece(PieceType type, bool isWhite, Position position)
         {
-            Piece piece = PieceFactory.createPiece(type, isWhite, row, col);
-            _state.Board[row, col] = piece;
+            Piece piece = PieceFactory.createPiece(type, isWhite, position);
+            _state.Board[position.Row, position.Col] = piece;
         }
 
-        public Piece? fetchPieceAt(int row, int col)
+        public Piece? fetchPieceAt(Position position)
         {
-            return _state.Board[row, col];
+            return _state.Board[position.Row, position.Col];
         }
 
         public King? fetchKing(bool isWhite)

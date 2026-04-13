@@ -89,15 +89,15 @@ namespace Chess.UI
             }
         }
     
-        public static void drawArrow((int, int) from, (int, int) to, Color color, Grid board)
+        public static void drawArrow(Move move, Color color, Grid board)
         {
             int cellSize = 50;
             double opc = 0.7;
     
-            double x1 = from.Item2 * cellSize + cellSize / 2.0;
-            double y1 = from.Item1 * cellSize + cellSize / 2.0;
-            double x2 = to.Item2 * cellSize + cellSize / 2.0;
-            double y2 = to.Item1 * cellSize + cellSize / 2.0;
+            double x1 = move.From.Col * cellSize + cellSize / 2.0;
+            double y1 = move.From.Row * cellSize + cellSize / 2.0;
+            double x2 = move.To.Col * cellSize + cellSize / 2.0;
+            double y2 = move.To.Row * cellSize + cellSize / 2.0;
 
             double angle = Math.Atan2(y2 - y1, x2 - x1);
             double arrowSize = 15;

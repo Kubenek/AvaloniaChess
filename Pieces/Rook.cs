@@ -11,16 +11,16 @@ namespace Chess.Pieces
 {
     public class Rook : Piece
     {
-        public Rook(bool isWhite) : base(isWhite)
+        public Rook(bool isWhite, Position coords) : base(isWhite, coords)
         {
             Texture = "♜";
         }
 
         public bool hasMoved = false;
 
-        public override List<(int, int)> availableMoves(ChessManager manager) 
+        public override List<Position> availableMoves(ChessManager manager) 
         {
-            var moves = new List<(int, int)>();
+            var moves = new List<Position>();
 
             (int, int)[] directions =
             [
@@ -30,12 +30,10 @@ namespace Chess.Pieces
                 (0, 1)     // right
             ];
 
-            var pieces = manager._state.Board;
-
             foreach(var (rowDir, colDir) in directions)
             {
-                int currentRow =    Row;
-                int currentCol = Column;
+                int currentRow = Coords.Row;
+                int currentCol = Coords.Col;
 
                 while(true)
                 {
@@ -44,13 +42,14 @@ namespace Chess.Pieces
 
                     if(currentRow < 0 || currentCol < 0 || currentRow >= 8 || currentCol >= 8) break;
 
-                    var targetSquare = pieces[currentRow, currentCol];
+                    Position pos = new(currentRow, currentCol);
+                    var targetSquare = manager.fetchPieceAt(pos);
 
                     if(targetSquare == null)
-                        moves.Add((currentRow, currentCol));
+                        moves.Add(pos);
                     else if(targetSquare.IsWhite != IsWhite)
                     {
-                        moves.Add((currentRow, currentCol));
+                        moves.Add(pos);
                         break;
                     }
                     else break;
@@ -63,9 +62,7 @@ namespace Chess.Pieces
 
         public override Piece Clone()
         {
-            Rook rook = new(IsWhite);
-            rook.Row = Row;
-            rook.Column = Column;
+            Rook rook = new(IsWhite, Coords);
             rook.hasMoved = hasMoved;
 
             return rook;

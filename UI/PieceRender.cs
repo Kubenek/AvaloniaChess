@@ -24,8 +24,8 @@ namespace Chess.UI
                 if(piece is null) continue;
                 TextBlock pieceVis = createPieceVisual(piece);
 
-                int row = piece.Row; 
-                int col = piece.Column;
+                int row = piece.Coords.Row; 
+                int col = piece.Coords.Col;
 
                 Grid.SetRow    (pieceVis, row);
                 Grid.SetColumn (pieceVis, col);
@@ -59,41 +59,43 @@ namespace Chess.UI
             return pieceVisual;
         }
     
-        public void movePiece(Grid GameBoard, TextBlock pieceVis, Piece piece, int row, int col, ChessManager _manager)
+        public void movePiece(Grid GameBoard, TextBlock pieceVis, Piece piece, Position destination, ChessManager _manager)
         {
             GameBoard.Children.Remove(pieceVis);
 
-            var target = _manager.fetchPieceAt(row, col);
+            var target = _manager.fetchPieceAt(destination);
 
             if(target is not null)
             {
                 TextBlock pieceVisual = _visuals[target];
                 GameBoard.Children.Remove(pieceVisual);
-            } else if(target is null && piece is Pawn && piece.Column != col)
+            } else if(target is null && piece is Pawn && piece.Coords.Col != destination.Col)
             {
-                Piece capPawn = _manager.fetchPieceAt(piece.Row, col)!;
+                Position pos = new(piece.Coords.Row, destination.Col);
+                Piece capPawn = _manager.fetchPieceAt(pos)!;
                 TextBlock vis = _visuals[capPawn];
                 GameBoard.Children.Remove(vis);
             } else if(piece is King && target is null)
             {
-                int distance = Math.Abs(piece.Column - col);
+                int distance = Math.Abs(piece.Coords.Col - destination.Col);
                 if(distance >= 2)
                 {
-                    int rookCol = col > piece.Column ? col + 1 : col - 2;  // Kingside: col+1, Queenside: col-2
-                    int newRookCol = col > piece.Column ? col - 1 : col + 1;  // Kingside: col-1, Queenside: col+1
+                    int rookCol = destination.Col > piece.Coords.Col ? destination.Col + 1 : destination.Col - 2;  // Kingside: col+1, Queenside: col-2
+                    int newRookCol = destination.Col > piece.Coords.Col ? destination.Col - 1 : destination.Col + 1;  // Kingside: col-1, Queenside: col+1
                     
-                    Piece rook = _manager.fetchPieceAt(row, rookCol)!;
+                    Position pos = new (destination.Row, rookCol);
+                    Piece rook = _manager.fetchPieceAt(pos)!;
                     TextBlock rookVis = _visuals[rook];
                     
                     GameBoard.Children.Remove(rookVis);
-                    Grid.SetRow(rookVis, row);
+                    Grid.SetRow(rookVis, destination.Row);
                     Grid.SetColumn(rookVis, newRookCol);
                     GameBoard.Children.Add(rookVis);
                 }
             }
  
-            Grid.SetRow    (pieceVis, row);
-            Grid.SetColumn (pieceVis, col);
+            Grid.SetRow    (pieceVis, destination.Row);
+            Grid.SetColumn (pieceVis, destination.Col);
 
             GameBoard.Children.Add(pieceVis);
         }
@@ -104,7 +106,7 @@ namespace Chess.UI
             GameBoard.Children.Remove(pVis);
             _visuals.Remove(piece);
 
-            int row = piece.Row; int col = piece.Column;
+            int row = piece.Coords.Row; int col = piece.Coords.Col;
 
             TextBlock pieceVisual = createPieceVisual(newPiece);
             _visuals[newPiece] = pieceVisual;

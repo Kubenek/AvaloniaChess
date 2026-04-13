@@ -13,33 +13,40 @@ namespace Chess.UI
         private Border? [,] highlightedSquares = new Border[8,8];
         private Border? [,] checks             = new Border[8,8];
 
-        public event Action<Piece, TextBlock, int, int>? MoveMade;
+        public event Action<Piece, TextBlock, Move>? MoveMade;
 
-        public void highlightReviewMove(Grid GameBoard, List<(int, int)> moves)
+        public void highlightReviewMove(Grid gameBoard, Move move)
         {
-            foreach(var m in moves)
+            var fromSquare = new Border
             {
-                int row = m.Item1; int col = m.Item2;
+                Background = Brushes.Blue,
+                Opacity = 0.25
+            };
+            Grid.SetRow(fromSquare, move.From.Row);
+            Grid.SetColumn(fromSquare, move.From.Col);
+            gameBoard.Children.Add(fromSquare);
+            highlightedSquares[move.From.Row, move.From.Col] = fromSquare;
 
-                var square = new Border
-                {
-                   Background = Brushes.Blue,
-                   Opacity = 0.25
-                };
-
-                Grid.SetRow(square, row);
-                Grid.SetColumn(square, col);
-
-                GameBoard.Children.Add(square);
-                highlightedSquares[row, col] = square;
-            }
+            var toSquare = new Border
+            {
+                Background = Brushes.Blue,
+                Opacity = 0.25
+            };
+            Grid.SetRow(toSquare, move.To.Row);
+            Grid.SetColumn(toSquare, move.To.Col);
+            gameBoard.Children.Add(toSquare);
+            highlightedSquares[move.To.Row, move.To.Col] = toSquare;
         }
 
-        public void highlightPieceMoves(Piece piece, Grid GameBoard, TextBlock pieceVis, List<(int, int)> moves)
+        public void highlightPieceMoves(Piece piece, Grid GameBoard, TextBlock pieceVis, List<Position> moves)
         {
-            foreach(var move in moves)
+            foreach(var pos in moves)
             {
-                int row = move.Item1; int col = move.Item2;
+                int row = pos.Row; int col = pos.Col;
+
+                Position from = piece.Coords;
+                Position to = new(row, col);
+                Move move = new Move(from, to);
 
                 var square = new Border
                 {
@@ -49,7 +56,7 @@ namespace Chess.UI
 
                 square.PointerPressed += (sender, e) =>
                 {
-                    MoveMade?.Invoke(piece, pieceVis, row, col);
+                    MoveMade?.Invoke(piece, pieceVis, move);
                 };
 
                 Grid.SetRow(square, row);
@@ -70,18 +77,18 @@ namespace Chess.UI
             Array.Clear(highlightedSquares);
         }
     
-        public void highlightCaptures(List<(int, int)> positions)
+        public void highlightCaptures(List<Position> positions)
         {
             foreach(var pos in positions)
             {
-                int row = pos.Item1; int col = pos.Item2;
+                int row = pos.Row; int col = pos.Col;
 
                 if(highlightedSquares[row, col] is not null) highlightedSquares[row, col]!.Background = Brushes.Red;
 
             }
         }
     
-        public void highlightCheck(Grid GameBoard, int row, int col)
+        public void highlightCheck(Grid GameBoard, Position pos)
         {
             var square = new Border
             {
@@ -90,17 +97,17 @@ namespace Chess.UI
                 IsHitTestVisible = false
             };
 
-            Grid.SetRow(square, row);
-            Grid.SetColumn(square, col);
+            Grid.SetRow(square, pos.Row);
+            Grid.SetColumn(square, pos.Col);
 
             GameBoard.Children.Add(square);
-            checks[row, col] = square;
+            checks[pos.Row, pos.Col] = square;
         }
     
-        public bool isHighlighted(int row, int col)
+        public bool isHighlighted(Position pos)
         {
-            if(highlightedSquares[row, col] is not null) return true;
-            if(checks[row, col] is not null) return true;
+            if(highlightedSquares[pos.Row, pos.Col] is not null) return true;
+            if(checks[pos.Row, pos.Col] is not null) return true;
             return false;
         }
 

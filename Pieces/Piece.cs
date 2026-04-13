@@ -6,16 +6,15 @@ using Chess.Logic;
 
 namespace Chess.Pieces
 {
-    public abstract class Piece(bool isWhite)
+    public abstract class Piece(bool isWhite, Position coords)
     {
         public bool IsWhite { get; set; } = isWhite;
 
         public string Texture { get; protected set; } = "";
 
-        public int Row { get; set;}
-        public int Column { get; set;}
+        public Position Coords { get; set; } = coords;
 
-        public abstract List<(int, int)> availableMoves(ChessManager manager);
+        public abstract List<Position> availableMoves(ChessManager manager);
         public abstract Piece Clone();
 
     }

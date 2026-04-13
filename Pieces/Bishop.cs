@@ -1,6 +1,7 @@
 
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using Avalonia.Diagnostics.Screenshots;
 using Chess.Logic;
 using SkiaSharp;
@@ -9,14 +10,14 @@ namespace Chess.Pieces
 {
     public class Bishop : Piece
     {
-        public Bishop(bool isWhite) : base(isWhite)
+        public Bishop(bool isWhite, Position coords) : base(isWhite, coords)
         {
             Texture = "♝";
         }
 
-        public override List<(int, int)> availableMoves(ChessManager manager) 
+        public override List<Position> availableMoves(ChessManager manager) 
         {
-            var moves = new List<(int, int)>();
+            var moves = new List<Position>();
 
             (int, int)[] directions = new (int, int)[]
             {
@@ -26,12 +27,10 @@ namespace Chess.Pieces
                 (1, 1)     // down-right
             };
 
-            var pieces = manager._state.Board;
-
             foreach(var (rowDir, colDir) in directions)
             {
-                int currentRow =    Row;
-                int currentCol = Column;
+                int currentRow = Coords.Row;
+                int currentCol = Coords.Col;
 
                 while(true)
                 {
@@ -40,30 +39,25 @@ namespace Chess.Pieces
 
                     if(currentRow < 0 || currentCol < 0 || currentRow >= 8 || currentCol >= 8) break;
 
-                    var targetSquare = pieces[currentRow, currentCol];
+                    Position pos = new(currentRow, currentCol);
+                    var targetSquare = manager.fetchPieceAt(pos);
 
                     if(targetSquare == null)
-                        moves.Add((currentRow, currentCol));
+                        moves.Add(pos);
                     else if(targetSquare.IsWhite != IsWhite)
                     {
-                        moves.Add((currentRow, currentCol));
+                        moves.Add(pos);
                         break;
                     }
                     else break;
                 }
-
             }
-
             return moves;
         }
 
         public override Piece Clone()
         {
-            Bishop bish = new(IsWhite);
-            bish.Row    =    Row;
-            bish.Column = Column;
-
-            return bish;
+            return new Bishop(IsWhite, Coords);
         }
 
     }
