@@ -10,6 +10,7 @@ using Chess.UI;
 using Avalonia.Media;
 using System.Linq;
 using Chess.Factories;
+using Chess.Modules;
 
 namespace Chess.Views;
 
@@ -25,6 +26,9 @@ public partial class GameView : UserControl
 
     private bool _isPromoting  = false;
     private bool _inReviewMode = false;
+    private bool _disableInput = false;
+
+    public event EventHandler? BackToMenu;
 
     public GameView()
     {
@@ -50,10 +54,26 @@ public partial class GameView : UserControl
 
         MoveList.EntryPressed += EntryClicked;
         Components.ExitPressed += ExitReviewMode;
+
+        ButtonMenu.Click += ExitToMenu;
+    }
+
+    private void ExitToMenu(object? s, EventArgs e)
+    {
+        _disableInput = true;
+
+        MenuConf.setText("Are you sure you want to exit to the menu?");
+
+        MenuConf.ButtonConfirm += (s, e) => { BackToMenu?.Invoke(s, e); };
+        MenuConf.ButtonDecline += (s, e) => { MenuConf.Hide(); _disableInput = false; };
+
+        MenuConf.Show();
     }
 
     private void ExitReviewMode(object? sender, EventArgs e)
     {
+        if(_disableInput) return;
+
         _inReviewMode = false;
 
         _highlighter.clearHighlights(GameBoard);
@@ -68,6 +88,8 @@ public partial class GameView : UserControl
 
     private void EntryClicked(MoveEntry entry)
     {
+        if(_disableInput) return;
+
         _inReviewMode = true;
 
         _highlighter.clearHighlights(GameBoard);
@@ -128,6 +150,8 @@ public partial class GameView : UserControl
 
     private async void PromotePawn(Pawn pawn)
     {
+        if(_disableInput) return;
+
         PromotionDialog.Show(pawn.IsWhite);
         _isPromoting = true;
 
@@ -169,6 +193,8 @@ public partial class GameView : UserControl
 
     private void ExecuteMove(Piece piece, TextBlock pieceVis, Move move)
     {
+        if(_disableInput) return;
+
         _render.movePiece(GameBoard, pieceVis, piece, move.To, _manager); //? Moves piece and captures the piece visually  
         bool cap = _engine.movePiece(piece, move.To, _manager, false);    //? Moves piece and captures the piece logically
         _highlighter.clearHighlights(GameBoard);
@@ -201,6 +227,7 @@ public partial class GameView : UserControl
 
     private void PieceClicked(Piece piece, TextBlock pieceVis)
     {
+        if(_disableInput) return;
         if(_isPromoting)  return;
         if(_inReviewMode) return;
         _highlighter.clearHighlights(GameBoard);

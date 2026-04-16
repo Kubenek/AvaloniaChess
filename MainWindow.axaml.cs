@@ -11,7 +11,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        ShowMenu();
+        ShowMenu(); 
     }
 
     private void ShowMenu()
@@ -23,7 +23,9 @@ public partial class MainWindow : Window
 
     private void startGame(object? s, EventArgs e)
     {
-        ContentArea.Content = new GameView();
+        var _gameView = new GameView();
+        _gameView.BackToMenu += (_, _) => ShowMenu();
+        ContentArea.Content = _gameView;
     }
 
 }
