@@ -234,70 +234,9 @@ public partial class GameView : UserControl
 
         if(piece.IsWhite != _manager._state.IsWhiteTurn) return;
 
-        var moves = piece.availableMoves(_manager);
+        var (moves, captures) = _engine.getPieceMoves(piece, _manager);
 
-        List<Position> legalMoves = [];
-        List<Position> captures   = [];
-
-        foreach(var position in moves)
-        {
-            Move move = new(piece.Coords, position);
-            if(!_engine.isMoveLegal(move, _manager)) continue;
-
-            legalMoves.Add(move.To);
-            var target = _manager.fetchPieceAt(move.To);
-            if(target != null && target.IsWhite != piece.IsWhite) captures.Add(move.To);
-        }
-
-        if(piece is Pawn pawn)
-        {
-            for(int i=0; i<2; i++)
-            {
-                int column = (i==0) ? pawn.Coords.Col - 1 : pawn.Coords.Row + 1;
-                int row = pawn.Coords.Row;
-
-                if(column < 0 || column >= 8) continue;
-                
-                var target = _manager.fetchPieceAt(new Position(row, column));
-
-                if(target != null && target.IsWhite != piece.IsWhite && target is Pawn epawn && epawn.lastMoveDouble)
-                {
-                    int r = pawn.IsWhite ? pawn.Coords.Row - 1 : pawn.Coords.Row + 1;
-                    int c = column;
-                    Position posFrom = new(row, pawn.Coords.Col);
-                    Position posTo = new(r, c);
-                    Move mv = new(posFrom, posTo);
-
-                    if(!_engine.isMoveLegal(mv, _manager)) continue;       
-                    legalMoves.Add(posTo); captures.Add(posTo);
-                }
-                
-            }
-        }
-
-        if(piece is King king && !king.hasMoved)
-        {
-            int row = king.Coords.Row;
-            int col = king.Coords.Col;
-
-            var c1 = _manager.fetchPieceAt(new Position(row, col+1));
-            var c2 = _manager.fetchPieceAt(new Position(row, col+2));
-            var c3 = _manager.fetchPieceAt(new Position(row, col+3));
-
-            if(c1 is null && c2 is null && c3 is Rook rook && !rook.hasMoved) 
-                legalMoves.Add(new Position(row, col+2));
-            
-            var cl1 = _manager.fetchPieceAt(new Position(row, col-1));
-            var cl2 = _manager.fetchPieceAt(new Position(row, col-2));
-            var cl3 = _manager.fetchPieceAt(new Position(row, col-3));
-            var cl4 = _manager.fetchPieceAt(new Position(row, col-4));
-
-            if(cl1 is null && cl2 is null && cl3 is null && cl4 is Rook r && !r.hasMoved) 
-                legalMoves.Add(new Position(row, col-2));
-
-        }
-
-        _highlighter.highlightPieceMoves(piece, GameBoard, pieceVis, legalMoves);
+        _highlighter.highlightPieceMoves(piece, GameBoard, pieceVis, moves);
         _highlighter.highlightCaptures(captures);
     }
 
