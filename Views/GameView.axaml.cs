@@ -176,6 +176,7 @@ public partial class GameView : UserControl
                 _                => "Q"
             };
 
+            lastMove.board[pawn.Coords.Row, pawn.Coords.Col] = PieceFactory.createPiece(type, pawn.IsWhite, pawn.Coords);
             MoveEntry newEntry = new(lastMove.move + $"={symbol}", lastMove.player, lastMove.board, lastMove.Move);
             MoveList.editMove(0, newEntry);
         }
@@ -242,6 +243,7 @@ public partial class GameView : UserControl
 
     private void onPromotionChoice(PieceType type)
     {
+        if(_disableInput) return;
         _promotionChoice?.SetResult(type);
     }
 
