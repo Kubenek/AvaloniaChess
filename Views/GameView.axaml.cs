@@ -1,16 +1,14 @@
 using Avalonia.Controls;
+using Avalonia.Media;
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-
-using Chess.Logic;
-using Chess.Pieces;
-using Chess.UI;
-using Avalonia.Media;
 using System.Linq;
+
 using Chess.Factories;
-using Chess.Modules;
+using Chess.Pieces;
+using Chess.Logic;
+using Chess.UI;
 
 namespace Chess.Views;
 
@@ -22,11 +20,9 @@ public partial class GameView : UserControl
     private MoveHighlighter _highlighter;
     private PieceRender     _render;
 
-    private TaskCompletionSource<PieceType>? _promotionChoice;
+    private InputType inputType = InputType.Normal;
 
-    private bool _isPromoting  = false;
-    private bool _inReviewMode = false;
-    private bool _disableInput = false;
+    private TaskCompletionSource<PieceType>? _promotionChoice;
 
     public event EventHandler? BackToMenu;
 
@@ -60,21 +56,21 @@ public partial class GameView : UserControl
 
     private void ExitToMenu(object? s, EventArgs e)
     {
-        _disableInput = true;
+        InputType lastInputType = inputType;
+        inputType = InputType.MenuMode;
 
         MenuConf.setText("Are you sure you want to exit to the menu?");
 
         MenuConf.ButtonConfirm += (s, e) => { BackToMenu?.Invoke(s, e); };
-        MenuConf.ButtonDecline += (s, e) => { MenuConf.Hide(); _disableInput = false; };
+        MenuConf.ButtonDecline += (s, e) => { MenuConf.Hide(); inputType = lastInputType; };
 
         MenuConf.Show();
     }
 
     private void ExitReviewMode(object? sender, EventArgs e)
     {
-        if(_disableInput) return;
-
-        _inReviewMode = false;
+        if(inputType == InputType.MenuMode) return;
+        inputType = InputType.Normal;
 
         _highlighter.clearHighlights(GameBoard);
         _render.wipeBoard(GameBoard);
@@ -88,9 +84,8 @@ public partial class GameView : UserControl
 
     private void EntryClicked(MoveEntry entry)
     {
-        if(_disableInput) return;
-
-        _inReviewMode = true;
+        if(!(inputType is InputType.Normal or InputType.ReviewMode)) return;
+        inputType = InputType.ReviewMode;
 
         _highlighter.clearHighlights(GameBoard);
         _highlighter.clearCheck(GameBoard);
@@ -119,27 +114,8 @@ public partial class GameView : UserControl
 
     private void LogMove(Piece piece, Move _move, bool capture, GameStateType state)
     {
-        char column = (char)('a' + _move.To.Col);
-        char fromColumn = (char)('a' + _move.From.Col);
-
-        string ch = (state is GameStateType.Checkmate) ? "#" : (state is GameStateType.Check ? "+" : "");
-        string cap = capture ? "x" : "";
+        string move = MoveNotation.getNotation(piece, _move, capture, state);
         string player = piece.IsWhite ? "White" : "Black";
-
-        int rank = 8 - _move.To.Row;
-        int horizontalDist = Math.Abs(_move.From.Col - _move.To.Col);
-
-        string template = $"{cap}{column}{rank}{ch}";
-        string move = piece switch
-        {
-            Pawn => (capture ? $"{fromColumn}x" : "") + $"{column}{rank}{ch}",
-            Bishop =>  "B" + template, 
-            Rook =>  "R" + template, 
-            Queen =>  "Q" + template,
-            Knight =>  "N" + template,
-            King =>  (horizontalDist < 2) ? "K" + template : ((_move.To.Col > _move.From.Col) ? "O-O" : "O-O-O"),
-            _ => ""
-        };
 
         ChessManager clone = _manager.Clone();
         Piece?[,] board = clone._state.Board;
@@ -150,56 +126,62 @@ public partial class GameView : UserControl
 
     private async void PromotePawn(Pawn pawn)
     {
-        if(_disableInput) return;
+        // Show promotion dialog (UI)
+        // Await and get player input (Logic)
+        // Promote the piece (Logic)
+        // Update visuals, move list component and board (UI)
+        // Change player turn, reset input restrictions (Logic)
+        // Hide dialog, change player turn text components (UI)
+
+        if(inputType != InputType.Normal) return;
+        inputType = InputType.PromotionMode;
 
         PromotionDialog.Show(pawn.IsWhite);
-        _isPromoting = true;
 
         _promotionChoice = new TaskCompletionSource<PieceType>();
         PieceType type = await _promotionChoice.Task;
 
         var (coords, isWhite) = (pawn.Coords, pawn.IsWhite);
         Piece piece = PieceFactory.createPiece(type, isWhite, coords); 
-
         _manager._state.Board[coords.Row, coords.Col] = piece;
+
         _render.updatePieceVisual(GameBoard, pawn, piece);
+        UpdateMoveList(type);
+        HighlightCheckIfNeeded(pawn, GameBoard);
 
-        if(MoveList.getLength() > 0)
-        {
-            MoveEntry lastMove = MoveList.getLastMove()!;
-            string symbol = type switch
-            {
-                PieceType.Queen  => "Q",
-                PieceType.Rook   => "R",
-                PieceType.Knight => "N",
-                PieceType.Bishop => "B",
-                _                => "Q"
-            };
-
-            lastMove.board[pawn.Coords.Row, pawn.Coords.Col] = PieceFactory.createPiece(type, pawn.IsWhite, pawn.Coords);
-            MoveEntry newEntry = new(lastMove.move + $"={symbol}", lastMove.player, lastMove.board, lastMove.Move);
-            MoveList.editMove(0, newEntry);
-        }
-
-        King eKing = _manager.fetchKing(!pawn.IsWhite)!;
-        if(Evaluator.isKingInCheck(eKing, _manager) && !_highlighter.isHighlighted(eKing.Coords))
-            _highlighter.highlightCheck(GameBoard, eKing.Coords);
-
-        _isPromoting = false;
+        inputType = InputType.Normal;
         _manager._state.IsWhiteTurn = !_manager._state.IsWhiteTurn;
 
         PromotionDialog.Hide();
         Components.updateTurnText(_manager._state.IsWhiteTurn, TextWhite, TextBlack);
     }
 
+    private void UpdateMoveList(PieceType type)
+    {
+        MoveEntry lastMove = MoveList.getLastMove()!;
+        string newNotation = MoveNotation.addPromoteNotation(lastMove.move, type);
+        lastMove.board = _manager._state.Board;
+        MoveEntry newEntry = new(newNotation, lastMove.player, lastMove.board, lastMove.Move);
+        MoveList.editMove(0, newEntry);
+    }
+
+    private void HighlightCheckIfNeeded(Pawn pawn, Grid GameBoard)
+    {
+        King enemyKing = _manager.fetchKing(!pawn.IsWhite)!;
+        
+        if(Evaluator.isKingInCheck(!pawn.IsWhite, _manager) && !_highlighter.isHighlighted(enemyKing.Coords))
+            _highlighter.highlightCheck(GameBoard, enemyKing.Coords);
+    }
+
     private void ExecuteMove(Piece piece, TextBlock pieceVis, Move move)
     {
-        if(_disableInput) return;
+        if(inputType != InputType.Normal) return;
 
         _render.movePiece(GameBoard, pieceVis, piece, move.To, _manager); //? Moves piece and captures the piece visually  
-        bool cap = _engine.movePiece(piece, move.To, _manager, false);    //? Moves piece and captures the piece logically
         _highlighter.clearHighlights(GameBoard);
         _highlighter.clearCheck(GameBoard);
+
+        bool cap = _engine.movePiece(piece, move.To, _manager, false);
 
         if(piece is King k) k.hasMoved = true;
         if(piece is Rook r) r.hasMoved = true;
@@ -228,9 +210,7 @@ public partial class GameView : UserControl
 
     private void PieceClicked(Piece piece, TextBlock pieceVis)
     {
-        if(_disableInput) return;
-        if(_isPromoting)  return;
-        if(_inReviewMode) return;
+        if(inputType != InputType.Normal) return;
         _highlighter.clearHighlights(GameBoard);
 
         if(piece.IsWhite != _manager._state.IsWhiteTurn) return;
@@ -243,8 +223,8 @@ public partial class GameView : UserControl
 
     private void onPromotionChoice(PieceType type)
     {
-        if(_disableInput) return;
-        _promotionChoice?.SetResult(type);
+        if(inputType == InputType.PromotionMode)
+            _promotionChoice?.SetResult(type);
     }
 
 }
