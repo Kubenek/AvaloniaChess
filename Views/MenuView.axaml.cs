@@ -17,7 +17,7 @@ public partial class MenuView : UserControl
         InitializeComponent();
 
         btnStart.Click += onStart;
-        btnQuit. Click += onQuit;
+        btnQuit.Click  += onQuit;
     }
 
 

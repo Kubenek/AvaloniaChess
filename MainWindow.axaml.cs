@@ -14,11 +14,18 @@ public partial class MainWindow : Window
         ShowMenu(); 
     }
 
-    private void ShowMenu()
+    private void ShowMenu() 
     {
         var menuView = new MenuView();
-        menuView.StartGame += startGame;
+        menuView.StartGame += ShowSelectionMenu;
         ContentArea.Content = menuView;
+    }
+
+    private void ShowSelectionMenu(object? s, EventArgs e)
+    {
+        var _selectMenuView = new GameModeView();
+        _selectMenuView.BackToMenu += (_,_) => ShowMenu();
+        ContentArea.Content = _selectMenuView;
     }
 
     private void startGame(object? s, EventArgs e)

@@ -1,0 +1,81 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Chess"
+             x:Class="Chess.Views.GameModeView">
+
+    <UserControl.Styles>
+        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="#33000000"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected:focus /template/ ContentPresenter">
+            <Setter Property="Background" Value="#33000000"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#44000000"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30"/>
+            <ColumnDefinition Width="60*"/>
+            <ColumnDefinition Width="40*"/>
+            <ColumnDefinition Width="30"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <Button Grid.Row="1" Grid.Column="1" Name="ButtonBack" Content="← Back" HorizontalAlignment="Left"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="Select Game Mode" Margin="10" FontSize="25" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+        <ListBox Grid.Row="2" Grid.Column="1" Name="ModeListBox">
+            
+            <ListBoxItem>
+                <StackPanel>
+                    <TextBlock Text="1v1 Local" FontSize="18" FontWeight="Bold"/>
+                    <TextBlock Text="Play against a friend" FontSize="12" Opacity="0.7"/>
+                </StackPanel>
+            </ListBoxItem>
+            
+            <ListBoxItem>
+                <StackPanel>
+                    <TextBlock Text="vs Computer" FontSize="18" FontWeight="Bold"/>
+                    <TextBlock Text="Challenge the AI" FontSize="12" Opacity="0.7"/>
+                </StackPanel>
+            </ListBoxItem>
+            
+            <ListBoxItem>
+                <StackPanel>
+                    <TextBlock Text="Puzzles" FontSize="18" FontWeight="Bold"/>
+                    <TextBlock Text="Solve tactical challenges" FontSize="12" Opacity="0.7"/>
+                </StackPanel>
+            </ListBoxItem>
+            
+        </ListBox>
+
+        <Border Grid.Row="2" Grid.Column="2" BorderThickness="1" BorderBrush="#40FFFFFF" Padding="20" Margin="20,0,0,0">
+            
+            <StackPanel Name="PreviewPanel">
+
+                <TextBlock Name="PreviewTitle" Text="Select a mode" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
+                <TextBlock Name="PreviewDescription" Text="Choose a game mode from the list to see details" TextWrapping="Wrap" Margin="0,0,0,20"/>
+                
+                <ContentControl Name="PreviewContent"/>
+
+                <Button Name="ButtonPlay" IsVisible="false" Content="Play" Margin="10" HorizontalAlignment="Center" Width="200" FontSize="18" HorizontalContentAlignment="Center"/>
+                
+            </StackPanel>
+            
+        </Border>
+
+    </Grid>
+
+</UserControl>
