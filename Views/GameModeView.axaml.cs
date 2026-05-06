@@ -7,12 +7,14 @@ namespace Chess.Views;
 public partial class GameModeView : UserControl
 {
     public event EventHandler? BackToMenu;
+    public event EventHandler? Start1v1;
     
     public GameModeView()
     {
         InitializeComponent();
         ModeListBox.SelectionChanged += ChangeSelection;
         ButtonBack.Click += ReturnToMenu;
+        ButtonPlay.Click += LaunchMode;
     }
 
     private void ChangeSelection(object? s, EventArgs e)
@@ -39,6 +41,22 @@ public partial class GameModeView : UserControl
             case 2: // Puzzles 
                 PreviewTitle.Text = "Puzzles";
                 PreviewDescription.Text = "Train your problem solving with puzzles. Solve positions ranging from mate-in-1 to complex endgames.";
+                break;
+        }
+    }
+
+    private void LaunchMode(object? s, EventArgs e)
+    {
+        switch (ModeListBox.SelectedIndex)
+        {
+            case 0: // 1v1 Local
+                Start1v1?.Invoke(s, e);
+                break;
+
+            case 1: // vs Computer
+                break;
+
+            case 2: // Puzzles 
                 break;
         }
     }
