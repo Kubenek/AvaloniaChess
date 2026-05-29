@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 
 using Chess.Pieces;
@@ -89,10 +88,8 @@ public class MoveEngine
         if(piece is null) return false;
 
         movePiece(piece, move.To, simulation, true);
-
-        King king = simulation.fetchKing(piece.IsWhite)!;
         
-        return !Evaluator.isKingInCheck(king, simulation);
+        return !Evaluator.isKingInCheck(piece.IsWhite, simulation);
     }
 
     public (List<Position> moves, List<Position> captures) getPieceMoves(Piece piece, ChessManager manager)

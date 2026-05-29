@@ -6,10 +6,8 @@ namespace Chess.Logic;
 public static class Evaluator
 {
     public static GameStateType EvaluateGame(bool isWhite, MoveEngine _engine, ChessManager _manager)
-    {
-        King king  = _manager.fetchKing(isWhite)!;
-        
-        if (isKingInCheck(king, _manager))
+    {        
+        if (isKingInCheck(isWhite, _manager))
         return isCheckmate(isWhite, _engine, _manager)
             ? GameStateType.Checkmate
             : GameStateType.Check;
@@ -19,8 +17,10 @@ public static class Evaluator
             : GameStateType.Playing;
     }
 
-    public static bool isKingInCheck(King king, ChessManager _manager)
+    public static bool isKingInCheck(bool isWhite, ChessManager _manager)
     {
+        King king = _manager.fetchKing(isWhite)!;
+
         for(int i=0; i<8; i++)
         {
             for(int j=0; j<8; j++) {
@@ -41,8 +41,7 @@ public static class Evaluator
 
     public static bool isCheckmate(bool isWhite, MoveEngine _engine, ChessManager _manager)
     {
-        King king = _manager.fetchKing(isWhite)!;
-        if(!isKingInCheck(king, _manager)) return false;
+        if(!isKingInCheck(isWhite, _manager)) return false;
         
         var pcs = _manager._state.Board.OfType<Piece>().Where(p => p.IsWhite == isWhite);
         
@@ -57,8 +56,7 @@ public static class Evaluator
 
     public static bool isStalemate(bool isWhite, MoveEngine _engine, ChessManager _manager)
     {
-        King king = _manager.fetchKing(isWhite)!;
-        if(isKingInCheck(king, _manager)) return false;
+        if(isKingInCheck(isWhite, _manager)) return false;
 
         var pcs = _manager._state.Board.OfType<Piece>().Where(piece => piece.IsWhite == isWhite);
 
@@ -70,6 +68,5 @@ public static class Evaluator
 
         return !hasLegalMove;
     }
-
 
 }

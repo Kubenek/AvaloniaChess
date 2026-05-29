@@ -1,6 +1,5 @@
 using System;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Chess.Views;
 
 namespace Chess;
@@ -14,17 +13,41 @@ public partial class MainWindow : Window
         ShowMenu(); 
     }
 
-    private void ShowMenu()
+    private void ShowMenu() 
     {
         var menuView = new MenuView();
-        menuView.StartGame += startGame;
+
+        menuView.StartGame    += ShowSelectionMenu;
+        menuView.OpenSettings += ShowSettings;
+
         ContentArea.Content = menuView;
     }
 
-    private void startGame(object? s, EventArgs e)
+    private void ShowSelectionMenu(object? s, EventArgs e)
+    {
+        var _selectMenuView = new GameModeView();
+
+        _selectMenuView.BackToMenu += (_,_) => ShowMenu();
+        _selectMenuView.Start1v1   += (_,_) => Mode1v1Local(s,e);
+
+        ContentArea.Content = _selectMenuView;
+    }
+
+    private void ShowSettings(object? s, EventArgs e)
+    {
+        var _settingsView = new SettingsView();
+
+        _settingsView.BackToMenu += (_,_) => ShowMenu();
+
+        ContentArea.Content = _settingsView;
+    }
+
+    private void Mode1v1Local(object? s, EventArgs e)
     {
         var _gameView = new GameView();
-        _gameView.BackToMenu += (_, _) => ShowMenu();
+
+        _gameView.BackToMenu += (_, _) => ShowSelectionMenu(s, e);
+        
         ContentArea.Content = _gameView;
     }
 
