@@ -47,12 +47,10 @@
             <StackPanel Name="PreviewPanel">
 
                 <TextBlock Name="PreviewTitle" Text="Setting" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
-                <TextBlock Name="PreviewDescription" Text="Lorem ipsum" TextWrapping="Wrap" Margin="0,0,0,20"/>
+                <TextBlock Name="PreviewDescription" Text="This feature isn't implemented yet" TextWrapping="Wrap" Margin="0,0,0,20"/>
                 
                 <ContentControl Name="PreviewContent"/>
 
-                <Button Name="ButtonPlay" IsVisible="false" Content="Play" Margin="10" HorizontalAlignment="Center" Width="200" FontSize="18" HorizontalContentAlignment="Center"/>
-                
             </StackPanel>
             
         </Border>
