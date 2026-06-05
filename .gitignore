@@ -2,6 +2,7 @@ bin/
 obj/
 .vs/
 .vscode/
+Engines/
 
 .DS_Store
 Thumbs.db

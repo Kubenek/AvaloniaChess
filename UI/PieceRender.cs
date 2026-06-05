@@ -125,5 +125,10 @@ namespace Chess.UI
             _visuals.Clear();
         }
 
+        public TextBlock FetchVisual(Piece piece)
+        {
+            return _visuals[piece];
+        }
+
     }
 }

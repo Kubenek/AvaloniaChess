@@ -10,12 +10,11 @@ using Chess.Pieces;
 using Chess.Logic;
 using Chess.UI;
 using Chess.Services;
-using System.Data.SqlTypes;
-using System.Drawing;
+using Avalonia;
 
 namespace Chess.Views;
 
-public partial class GameView : UserControl
+public partial class BotView : UserControl
 {
     private ChessManager     _manager;
     private MoveEngine       _engine;
@@ -23,13 +22,15 @@ public partial class GameView : UserControl
     private MoveHighlighter  _highlighter;
     private PieceRender      _render;
 
+    private StockfishService _stockfish;
+
     private InputType inputType = InputType.Normal;
 
     private TaskCompletionSource<PieceType>? _promotionChoice;
 
     public event EventHandler? BackToMenu;
 
-    public GameView()
+    public BotView()
     {
         InitializeComponent();
         PromotionDialog._promotionChoice += onPromotionChoice;
@@ -43,6 +44,9 @@ public partial class GameView : UserControl
 
         _engine = new MoveEngine();
         _engine.Promotion += PromotePawn;
+
+        _stockfish = new StockfishService();
+        _stockfish.Start();
 
         _highlighter = new MoveHighlighter();
         _highlighter.MoveMade += ExecuteMove;
@@ -177,7 +181,7 @@ public partial class GameView : UserControl
             _highlighter.highlightCheck(GameBoard, enemyKing.Coords);
     }
 
-    private void ExecuteMove(Piece piece, TextBlock pieceVis, Move move)
+    private async void ExecuteMove(Piece piece, TextBlock pieceVis, Move move)
     {
         if(inputType != InputType.Normal) return;
 
@@ -210,6 +214,24 @@ public partial class GameView : UserControl
 
         Components.updateTurnText(_manager._state.IsWhiteTurn, TextWhite, TextBlack);
         LogMove(piece, move, cap, state);
+
+        if(!_manager._state.IsWhiteTurn) 
+            await MakeStockfishMove(false);
+
+    }
+
+    private async Task MakeStockfishMove(bool isWhiteTurn)
+    {
+        string FEN = FENGenerator.GenerateOutput(_manager._state.Board, isWhiteTurn);
+        string UCI = await _stockfish.GetBestMoveAsync(FEN, 1000);
+
+        Move move = UciConverter.UciToMove(UCI);
+        Piece? piece = _manager._state.Board[move.From.Row, move.From.Col];
+
+        if(piece == null) return;
+
+        TextBlock pieceVisual = _render.FetchVisual(piece);
+        ExecuteMove(piece, pieceVisual, move);
     }
 
     private void PieceClicked(Piece piece, TextBlock pieceVis)
@@ -218,6 +240,7 @@ public partial class GameView : UserControl
         _highlighter.clearHighlights(GameBoard);
 
         if(piece.IsWhite != _manager._state.IsWhiteTurn) return;
+        if(!_manager._state.IsWhiteTurn) return;
 
         var (moves, captures) = _engine.getPieceMoves(piece, _manager);
 

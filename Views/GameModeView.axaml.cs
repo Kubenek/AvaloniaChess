@@ -8,6 +8,7 @@ public partial class GameModeView : UserControl
 {
     public event EventHandler? BackToMenu;
     public event EventHandler? Start1v1;
+    public event EventHandler? StartVsBot;
     
     public GameModeView()
     {
@@ -22,6 +23,7 @@ public partial class GameModeView : UserControl
         if (ModeListBox.SelectedIndex == -1)
         {
             ButtonPlay.IsVisible = false;
+            return;
         }
 
         ButtonPlay.IsVisible = true;
@@ -54,6 +56,7 @@ public partial class GameModeView : UserControl
                 break;
 
             case 1: // vs Computer
+                StartVsBot?.Invoke(s, e);
                 break;
 
             case 2: // Puzzles 
