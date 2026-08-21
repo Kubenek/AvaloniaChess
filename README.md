@@ -1,3 +1,5 @@
+# Project currently put on hiatus
+
 # Avalonia Chess
 A Chess application built in C# and Avalonia (Version 11.3.12)
 
